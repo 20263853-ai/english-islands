@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>English Islands - 6 Week English Learning</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏝️</text></svg>">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20260528">
   <style>
     
     :root {
@@ -118,14 +118,48 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <script>
+    /* === Version-based Cache Busting === */
+    var APP_VERSION = 'v5.1-20260528';
+    var CACHE_VERSION_KEY = 'ei_cache_version';
+
+    /* 1. Register SW with update detection */
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("sw.js");
+      navigator.serviceWorker.register("sw.js").then(function(reg) {
+        reg.addEventListener('updatefound', function() {
+          var newWorker = reg.installing;
+          newWorker.addEventListener('statechange', function() {
+            if (newWorker.state === 'activated') {
+              if (navigator.serviceWorker.controller) {
+                /* New SW activated while old one was running = update available */
+                console.log('[EI] New version available, refreshing...');
+                window.location.reload();
+              }
+            }
+          });
+        });
+      });
+
+      /* 2. Force-update check on every page load */
+      reg = navigator.serviceWorker.controller;
+      if (reg) {
+        reg.postMessage({ type: 'CHECK_VERSION', version: APP_VERSION });
+      }
     }
+
+    /* 3. Query param version check for CSS busting */
+    /* style.css already has ?v=20260528 in href */
+
+    /* 4. On visibility change (user switches back to tab), re-check */
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden && "serviceWorker" in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({ type: 'CHECK_VERSION', version: APP_VERSION });
+      }
+    });
   </script>
 </head>
 <body>
   <div id="app"></div>
-  <script src="data.js"></script>
-  <script src="app.js"></script>
+  <script src="data.js?v=20260528"></script>
+  <script src="app.js?v=20260528"></script>
 </body>
 </html>
