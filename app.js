@@ -31,7 +31,7 @@
     sessionStart: null
   };
 
-  var utterance = null, synth = window.speechSynthesis;
+  var utterance = null, synth = window.speechSynthesis || null;
   var playAllQueue = [], playAllIndex = 0;
 
   function isChild() { return state.user === 'mumu'; }
@@ -270,13 +270,13 @@
   }
 
   // ---- TTS ----
-  function stopSpeaking() { synth.cancel(); state.playingIdx = null; updatePlayingUI(); }
+  function stopSpeaking() { if(synth) synth.cancel(); state.playingIdx = null; updatePlayingUI(); }
   function speak(text, idx, onEnd) {
     stopSpeaking();
     var vc = APP_DATA[state.user].voice;
     utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = vc.lang; utterance.pitch = vc.pitch; utterance.rate = vc.rate;
-    var voices = synth.getVoices(), pref = null, tgt = vc.name || '';
+    var voices = synth ? synth.getVoices() : [], pref = null, tgt = vc.name || '';
     if (tgt) { for (var vi = 0; vi < voices.length; vi++) { if (voices[vi].name.indexOf(tgt)===0) { pref=voices[vi]; break; } } }
     if (!pref) {
       var ev = voices.filter(function(v){return v.lang&&v.lang.indexOf('en')===0&&v.localService;});
@@ -287,7 +287,7 @@
     state.playingIdx = idx; updatePlayingUI();
     utterance.onend = function(){ state.playingIdx=null; updatePlayingUI(); if(onEnd) onEnd(); };
     utterance.onerror = function(){ state.playingIdx=null; updatePlayingUI(); };
-    synth.speak(utterance);
+    if(synth) synth.speak(utterance);
   }
 
   // ---- Nav ----
@@ -887,7 +887,7 @@
   }
 
   function playAllFn() {
-    if (synth.speaking) { stopSpeaking(); playAllQueue=[]; var b=document.getElementById('play-all-text'); if(b) b.innerHTML='\u25b6 播放全部（'+APP_DATA[state.user].islands[state.islandIdx].sentences.length+' 句）'; return; }
+    if (synth && synth.speaking) { stopSpeaking(); playAllQueue=[]; var b=document.getElementById('play-all-text'); if(b) b.innerHTML='\u25b6 播放全部（'+APP_DATA[state.user].islands[state.islandIdx].sentences.length+' 句）'; return; }
     playAllQueue=APP_DATA[state.user].islands[state.islandIdx].sentences.slice(); playAllIndex=0; playNext();
   }
 
@@ -903,7 +903,7 @@
   function playAllReviewsFn() {
     var due = getAllDueReviews();
     if (due.length === 0) return;
-    if (synth.speaking) { stopSpeaking(); reviewQueue=[]; return; }
+    if (synth && synth.speaking) { stopSpeaking(); reviewQueue=[]; return; }
     reviewQueue = due.map(function(r) {
       return APP_DATA[r.uk] && APP_DATA[r.uk].islands[r.ii] ? APP_DATA[r.uk].islands[r.ii].sentences[r.si] : null;
     }).filter(function(s) { return s; });
@@ -921,7 +921,7 @@
   // ---- Init ----
   function init() {
     loadAll();
-    if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = function(){};
+    if (synth && synth.onvoiceschanged !== undefined) synth.onvoiceschanged = function(){};
     trackTimeStart();
     var appEl = document.getElementById('app');
     appEl.innerHTML =
