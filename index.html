@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>English Islands - 6 Week English Learning</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏝️</text></svg>">
-  <link rel="stylesheet" href="style.css?v=2026052902">
+  <link rel="stylesheet" href="style.css?v=2026052903">
   <style>
     
     :root {
@@ -26,12 +26,10 @@
       overflow-x: hidden;
     }
 
-    /* Page transitions */
     .page { display: none; animation: fadeIn 0.3s ease; }
     .page.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Card hover */
     .island-card {
       transition: all 0.2s ease;
       cursor: pointer;
@@ -41,13 +39,11 @@
       box-shadow: 0 8px 25px -5px rgba(0,0,0,0.1);
     }
 
-    /* Progress bar */
     .progress-fill {
       transition: width 0.5s ease;
       background: linear-gradient(90deg, var(--primary), var(--primary-light));
     }
 
-    /* Sentence item */
     .sentence-item {
       transition: all 0.15s ease;
     }
@@ -62,7 +58,6 @@
       opacity: 0.6;
     }
 
-    /* Play button pulse */
     @keyframes pulse-ring {
       0% { transform: scale(1); opacity: 1; }
       100% { transform: scale(1.4); opacity: 0; }
@@ -73,10 +68,9 @@
       inset: -4px;
       border-radius: 50%;
       border: 2px solid var(--primary);
-      animation: pulse-ring 1s ease-out infinite;
+      animation: pulse-ring 1s ease-infinite;
     }
 
-    /* Waveform animation */
     .wave-bar {
       animation: wave 0.6s ease-in-out infinite;
       transform-origin: bottom;
@@ -86,7 +80,6 @@
       50% { transform: scaleY(1); }
     }
 
-    /* Score badge */
     .score-badge {
       background: linear-gradient(135deg, #4F46E5, #7C3AED);
       color: white;
@@ -96,12 +89,10 @@
       font-size: 14px;
     }
 
-    /* Scroll */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
 
-    /* Shadow mode */
     .shadow-mode .sentence-text {
       filter: blur(8px);
       user-select: none;
@@ -118,48 +109,29 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <script>
-    /* === Version-based Cache Busting === */
-    var APP_VERSION = 'v5.3-2026052902';
-    var CACHE_VERSION_KEY = 'ei_cache_version';
+    /* === v5.4: Force clear ALL caches and old SWs === */
+    var APP_VERSION = 'v5.4-2026052903';
 
-    /* 1. Register SW with update detection */
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("sw.js").then(function(reg) {
-        reg.addEventListener('updatefound', function() {
-          var newWorker = reg.installing;
-          newWorker.addEventListener('statechange', function() {
-            if (newWorker.state === 'activated') {
-              if (navigator.serviceWorker.controller) {
-                /* New SW activated while old one was running = update available */
-                console.log('[EI] New version available, refreshing...');
-                window.location.reload();
-              }
-            }
-          });
-        });
+      // Step 1: Kill ALL existing service workers
+      navigator.serviceWorker.getRegistrations().then(function(regs) {
+        return Promise.all(regs.map(function(r) { return r.unregister(); }));
+      }).catch(function() {}).then(function() {
+        // Step 2: Clear ALL caches
+        if ('caches' in window) {
+          caches.keys().then(function(names) {
+            return Promise.all(names.map(function(n) { return caches.delete(n); }));
+          }).catch(function() {});
+        }
+        // Step 3: Register new SW (network-only mode)
+        navigator.serviceWorker.register("sw.js?v=2026052903");
       });
-
-      /* 2. Force-update check on every page load */
-      reg = navigator.serviceWorker.controller;
-      if (reg) {
-        reg.postMessage({ type: 'CHECK_VERSION', version: APP_VERSION });
-      }
     }
-
-    /* 3. Query param version check for CSS busting */
-    /* style.css already has ?v=2026052902 in href */
-
-    /* 4. On visibility change (user switches back to tab), re-check */
-    document.addEventListener('visibilitychange', function() {
-      if (!document.hidden && "serviceWorker" in navigator && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({ type: 'CHECK_VERSION', version: APP_VERSION });
-      }
-    });
   </script>
 </head>
 <body>
   <div id="app"></div>
-  <script src="data.js?v=2026052902"></script>
-  <script src="app.js?v=2026052902"></script>
+  <script src="data.js?v=2026052903"></script>
+  <script src="app.js?v=2026052903"></script>
 </body>
 </html>

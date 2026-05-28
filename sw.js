@@ -1,67 +1,47 @@
-var CACHE_NAME = 'english-islands-v5.2';
-var ASSETS = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/data.js',
-  '/app.js',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
-];
-var CURRENT_VERSION = 'v5.2-20260528';
+// English Islands SW v5.4 - Network Only, No Caching
+// Fixes: old cached versions causing blank page on Android
 
-/* Install: cache all static assets */
+var CACHE_NAME = 'english-islands-v5.4';
+var CURRENT_VERSION = 'v5.4-2026052903';
+
+// Install: clear ALL old caches immediately
 self.addEventListener('install', function(e) {
   e.waitUntil(
-    caches.open(CACHE_NAME).then(function(cache) {
-      return cache.addAll(ASSETS);
-    })
+    caches.keys().then(function(keys) {
+      return Promise.all(
+        keys.map(function(k) { return caches.delete(k); })
+      );
+    }).then(function() { self.skipWaiting(); })
   );
-  self.skipWaiting();
 });
 
-/* Activate: clean old caches */
+// Activate: clear ALL caches, claim all clients immediately
 self.addEventListener('activate', function(e) {
   e.waitUntil(
     caches.keys().then(function(keys) {
       return Promise.all(
-        keys.filter(function(k) { return k !== CACHE_NAME; })
-            .map(function(k) { return caches.delete(k); })
+        keys.map(function(k) { return caches.delete(k); })
       );
-    })
+    }).then(function() { self.clients.claim(); })
   );
-  self.clients.claim();
 });
 
-/* Fetch: network-first for all (ensures fresh content) */
+// Fetch: network-only, NO fallback to cache
 self.addEventListener('fetch', function(e) {
-  if (e.request.method !== 'GET') return;
   e.respondWith(
-    fetch(e.request).then(function(response) {
-      if (response && response.status === 200) {
-        var clone = response.clone();
-        caches.open(CACHE_NAME).then(function(cache) {
-          cache.put(e.request, clone);
-        });
-      }
-      return response;
-    }).catch(function() {
-      return caches.match(e.request).then(function(cached) {
-        if (cached) return cached;
-        if (e.request.destination === 'document') {
-          return caches.match('/index.html');
-        }
+    fetch(e.request).catch(function() {
+      // Offline: return a simple fallback page
+      return new Response('<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>English Islands</title><style>body{font-family:sans-serif;text-align:center;padding:40px;color:#666}h2{color:#4F46E5}</style></head><body><h2>Offline</h2><p>Please check your network connection.</p></body></html>', {
+        headers: { 'Content-Type': 'text/html' }
       });
     })
   );
 });
 
-/* Version check: if client reports a newer version, force reload */
+// Version check
 self.addEventListener('message', function(e) {
   if (e.data && e.data.type === 'CHECK_VERSION') {
     if (e.data.version !== CURRENT_VERSION) {
-      /* Version mismatch detected, tell client to reload */
       self.clients.matchAll().then(function(clients) {
         clients.forEach(function(client) {
           client.postMessage({ type: 'RELOAD_REQUIRED', version: CURRENT_VERSION });
