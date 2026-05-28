@@ -48,6 +48,7 @@
   }
 
   function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
+  function load(k) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch(e) { return null; } }
 
   // ---- SRS (Spaced Repetition System) ----
   var SRS_INTERVALS = [1, 3, 7, 14, 30]; // days
