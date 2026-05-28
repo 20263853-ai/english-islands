@@ -27,6 +27,7 @@
     favoriteSentences: [],
     srs: [],          // [{uk, ii, si, dueDate, interval, reps}]
     badges: [],       // [{id, date}]
+    showChinese: true, // toggle Chinese translation display
     sessionStart: null
   };
 
@@ -34,6 +35,8 @@
   var playAllQueue = [], playAllIndex = 0;
 
   function isChild() { return state.user === 'mumu'; }
+  function getEn(s) { return (typeof s === 'object' && s !== null) ? (s.en || '') : s; }
+  function getZh(s) { return (typeof s === 'object' && s !== null) ? (s.zh || '') : ''; }
 
   function todayStr() {
     var d = new Date();
@@ -198,6 +201,7 @@
 
   // ---- Core Data Functions ----
   function loadAll() {
+    var _sc = load('ei_show_cn'); if (_sc !== null) state.showChinese = _sc;
     try {
       var old = localStorage.getItem(OLD_KEY);
       if (old) {
@@ -516,6 +520,9 @@
     // Play All
     h += '<button onclick="app.playAll()" id="play-all-btn" class="w-full mb-4 py-2.5 rounded-lg ' + (isChild() ? 'bg-amber-500 hover:bg-amber-600' : 'bg-indigo-500 hover:bg-indigo-600') + ' text-white font-medium text-sm transition"><span id="play-all-text">\u25b6 播放全部（' + isl.sentences.length + ' 句）</span></button>';
 
+    // Chinese toggle
+    h += '<button onclick="app.toggleChinese()" class="w-full mb-2 py-2 rounded-lg border border-gray-200 bg-gray-50 text-gray-600 text-sm transition hover:bg-gray-100">' + (state.showChinese ? '\ud83d\udc64 \u9690\u85cf\u4e2d\u6587\u7ffb\u8bd1' : '\ud83c\udf10 \u663e\u793a\u4e2d\u6587\u7ffb\u8bd1') + '</button>';
+
     // Sentence list
     h += '<div class="space-y-2">';
     isl.sentences.forEach(function(s, idx) {
@@ -526,7 +533,7 @@
       h += '<div class="sentence-item bg-white rounded-xl border ' + (done ? 'border-green-200 bg-green-50/50' : 'border-gray-100') + ' p-4 flex items-start gap-3 transition" data-idx="' + idx + '">' +
         '<button onclick="app.playSentence(' + idx + ')" class="play-btn w-8 h-8 rounded-full ' + (isChild() ? 'bg-amber-100 hover:bg-amber-200' : 'bg-indigo-100 hover:bg-indigo-200') + ' flex items-center justify-center shrink-0 mt-0.5 transition"><svg class="w-4 h-4 ' + (isChild() ? 'text-amber-500' : 'text-indigo-500') + '" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>' +
         '<div class="flex-1 min-w-0">' +
-          (revealed ? '<p class="text-sm text-gray-800">' + esc(s) + '</p>' : '<p class="text-sm text-gray-400 italic">\u70b9\u64ad\u653e\u542c\u53d1\u97f3\uff0c\u731c\u731c\u662f\u4ec0\u4e48\uff1f</p>') +
+          (revealed ? '<p class="text-sm text-gray-800">' + esc(getEn(s)) + (state.showChinese && getZh(s) ? '<span class="text-gray-400 ml-2">- ' + esc(getZh(s)) + '</span>' : '') + '</p>' : '<p class="text-sm text-gray-400 italic">\u70b9\u64ad\u653e\u542c\u53d1\u97f3\uff0c\u731c\u731c\u662f\u4ec0\u4e48\uff1f</p>') +
           (srsItem ? '<p class="text-[10px] text-emerald-500 mt-1">\ud83d\udd04 \u590d\u4e60 ' + srsItem.reps + ' \u6b21 · \u4e0b\u6b21: ' + srsItem.dueDate + '</p>' : '') +
         '</div>' +
         '<div class="shrink-0 flex items-center gap-2">';
@@ -886,7 +893,7 @@
   function playNext() {
     if (playAllIndex>=playAllQueue.length) { playAllQueue=[]; var b=document.getElementById('play-all-text'); if(b) b.innerHTML='\u25b6 播放全部（'+APP_DATA[state.user].islands[state.islandIdx].sentences.length+' 句）'; return; }
     var b=document.getElementById('play-all-text'); if(b) b.innerHTML='\u23f8 停止（'+(playAllIndex+1)+'/'+playAllQueue.length+'）';
-    speak(playAllQueue[playAllIndex],playAllIndex,function(){setTimeout(function(){playAllIndex++;playNext();},1200);});
+    speak(getEn(playAllQueue[playAllIndex]),playAllIndex,function(){setTimeout(function(){playAllIndex++;playNext();},1200);});
   }
 
   // Review play helpers
@@ -905,7 +912,7 @@
 
   function playReviewNext() {
     if (reviewPlayIndex >= reviewQueue.length) { reviewQueue=[]; return; }
-    speak(reviewQueue[reviewPlayIndex], reviewPlayIndex, function() {
+    speak(getEn(reviewQueue[reviewPlayIndex]), reviewPlayIndex, function() {
       setTimeout(function() { reviewPlayIndex++; playReviewNext(); }, 1500);
     });
   }
@@ -933,7 +940,7 @@
     nav: function(p) { window.location.hash=p; navigate(p); },
     selectUser: function(uk) { state.user=uk; window.location.hash='u/'+uk; navigate('islands'); },
     selectIsland: function(idx) { state.islandIdx=idx; state.revealedSentences={}; window.location.hash='u/'+state.user+'/'+idx; navigate('detail'); },
-    playSentence: function(idx) { speak(APP_DATA[state.user].islands[state.islandIdx].sentences[idx],idx); },
+    playSentence: function(idx) { speak(getEn(APP_DATA[state.user].islands[state.islandIdx].sentences[idx]),idx); },
     markDone: function(idx) { markCompleted(state.user,state.islandIdx,idx); renderDetail(); },
     revealSentence: function(idx) { state.revealedSentences[idx]=true; renderDetail(); },
     toggleShadow: function() { state.shadowMode=!state.shadowMode; if(state.islandIdx!==null&&document.getElementById('page-detail').classList.contains('active')) renderDetail(); else renderIslands(); },
@@ -965,7 +972,7 @@
       var due = getAllDueReviews();
       var r = due[idx]; if(!r) return;
       var s = APP_DATA[r.uk].islands[r.ii].sentences[r.si];
-      speak(s, idx);
+      speak(getEn(s), idx);
     },
     markReviewed: function(uk, ii, si) {
       markReviewed(uk, ii, si);
@@ -978,7 +985,8 @@
         alert('获得成就：' + names);
       }
     },
-    playAllReviews: playAllReviewsFn
+    playAllReviews: playAllReviewsFn,
+    toggleChinese: function() { state.showChinese = !state.showChinese; save('ei_show_cn', state.showChinese); renderDetail(); }
   };
 
   window.addEventListener('hashchange', handleRoute);
