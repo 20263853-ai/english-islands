@@ -1,7 +1,8 @@
-const CACHE_NAME = 'english-islands-v4';
+const CACHE_NAME = 'english-islands-v5';
 const ASSETS = [
   '/',
   '/index.html',
+  '/style.css',
   '/data.js',
   '/app.js',
   '/manifest.json',
@@ -27,19 +28,19 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
-// Fetch: cache-first for static, network-first for dynamic
+// Fetch: network-first for all (ensures fresh content)
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   e.respondWith(
-    caches.match(e.request).then(cached => {
-      if (cached) return cached;
-      return fetch(e.request).then(response => {
-        if (response && response.status === 200) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
-        }
-        return response;
-      }).catch(() => {
+    fetch(e.request).then(response => {
+      if (response && response.status === 200) {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+      }
+      return response;
+    }).catch(() => {
+      return caches.match(e.request).then(cached => {
+        if (cached) return cached;
         if (e.request.destination === 'document') {
           return caches.match('/index.html');
         }
