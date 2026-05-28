@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>English Islands</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏝️</text></svg>">
+<style>
+:root{--primary:#4F46E5;--primary-light:#818CF8;--accent-adult:#EC4899;--accent-child:#F59E0B;--bg-adult:#FDF2F8;--bg-child:#FFFBEB;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;background:#F8FAFC;min-height:100vh;overflow-x:hidden;}
+.page{display:none;animation:fadeIn .3s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.island-card{transition:all .2s ease;cursor:pointer;}
+.island-card:hover{transform:translateY(-2px);box-shadow:0 8px 25px -5px rgba(0,0,0,.1);}
+.progress-fill{transition:width .5s ease;background:linear-gradient(90deg,var(--primary),var(--primary-light));}
+.sentence-item{transition:all .15s ease;}
+.sentence-item:hover{background:#F1F5F9;}
+.sentence-item.playing{background:#EEF2FF;border-left:3px solid var(--primary);}
+.sentence-item.completed{opacity:.6;}
+@keyframes pulse-ring{0%{transform:scale(1);opacity:1}100%{transform:scale(1.4);opacity:0}}
+.play-btn.playing::before{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--primary);animation:pulse-ring 1s ease-out infinite;}
+.wave-bar{animation:wave .6s ease-in-out infinite;transform-origin:bottom;}
+@keyframes wave{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1)}}
+.score-badge{background:linear-gradient(135deg,#4F46E5,#7C3AED);color:#fff;font-weight:700;border-radius:12px;padding:4px 12px;font-size:14px;}
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:3px;}
+.shadow-mode .sentence-text{filter:blur(8px);user-select:none;}
+.shadow-mode .sentence-text.revealed{filter:none;user-select:auto;}
+/* English Islands - Tailwind Utilities (inline) */
+/* Reset & Base */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+img { max-width: 100%; display: block; }
+button { cursor: pointer; font: inherit; }
+input, textarea, select, button { font: inherit; }
+a { color: inherit; text-decoration: none; }
+
+/* Display */
+.hidden { display: none !important; }
+.block { display: block; }
+.inline-block { display: inline-block; }
+.inline { display: inline; }
+.flex { display: flex; }
+.inline-flex { display: inline-flex; }
+.grid { display: grid; }
+.table { display: table; }
+.contents { display: contents; }
+.relative { position: relative; }
+.absolute { position: absolute; }
+.fixed { position: fixed; }
+.sticky { position: sticky; }
+.static { position: static; }
+
+/* Flexbox */
+.flex-row { flex-direction: row; }
+.flex-col { flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-1 { flex: 1 1 0%; }
+.flex-shrink-0 { flex-shrink: 0; }
+.shrink-0 { flex-shrink: 0; }
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+.items-center { align-items: center; }
+.items-baseline { align-items: baseline; }
+.items-stretch { align-items: stretch; }
+.justify-start { justify-content: flex-start; }
+.justify-end { justify-content: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-around { justify-content: space-around; }
+.gap-0\.5 { gap: 0.125rem; }
+.gap-1 { gap: 0.25rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.gap-0\.5 { gap: 0.125rem; }
+
+/* Grid */
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-cols-8 { grid-template-columns: repeat(8, 1fr); }
+.col-span-1 { grid-column: span 1 / span 1; }
+
+/* Spacing */
+.p-0 { padding: 0; }
+.p-1 { padding: 0.25rem; }
+.p-2 { padding: 0.5rem; }
+.p-3 { padding: 0.75rem; }
+.p-4 { padding: 1rem; }
+.p-5 { padding: 1.25rem; }
+.p-6 { padding: 1.5rem; }
+.p-8 { padding: 2rem; }
+.p-12 { padding: 3rem; }
+.px-1 { padding-left: 0.25rem; padding-right: 0.25rem; }
+.px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+.px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+.py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+.py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+.pt-0\.5 { padding-top: 0.125rem; }
+.pt-1 { padding-top: 0.25rem; }
+.pt-3 { padding-top: 0.75rem; }
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 0.75rem; }
+.mt-4 { margin-top: 1rem; }
+.mt-6 { margin-top: 1.5rem; }
+.mt-8 { margin-top: 2rem; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 0.75rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mb-8 { margin-bottom: 2rem; }
+.ml-1 { margin-left: 0.25rem; }
+.ml-2 { margin-left: 0.5rem; }
+.ml-3 { margin-left: 0.75rem; }
+.ml-13 { margin-left: 3.25rem; }
+.mr-0 { margin-right: 0; }
+.space-x-1 > * + * { margin-left: 0.25rem; }
+.space-x-2 > * + * { margin-left: 0.5rem; }
+.space-y-2 > * + * { margin-top: 0.5rem; }
+.space-y-3 > * + * { margin-top: 0.75rem; }
+
+/* Sizing */
+.w-3 { width: 0.75rem; }
+.w-4 { width: 1rem; }
+.w-5 { width: 1.25rem; }
+.w-6 { width: 1.5rem; }
+.w-8 { width: 2rem; }
+.w-10 { width: 2.5rem; }
+.w-12 { width: 3rem; }
+.w-full { width: 100%; }
+.h-2 { height: 0.5rem; }
+.h-3 { height: 0.75rem; }
+.h-4 { height: 1rem; }
+.h-5 { height: 1.25rem; }
+.h-6 { height: 1.5rem; }
+.h-8 { height: 2rem; }
+.h-10 { height: 2.5rem; }
+.h-12 { height: 3rem; }
+.h-16 { height: 4rem; }
+.min-w-0 { min-width: 0; }
+.max-w-lg { max-width: 32rem; }
+.max-w-2xl { max-width: 42rem; }
+
+/* Typography */
+.text-xs { font-size: 0.75rem; line-height: 1rem; }
+.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.text-base { font-size: 1rem; line-height: 1.5rem; }
+.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+.text-2xl { font-size: 1.5rem; line-height: 2rem; }
+.text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+.text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-bold { font-weight: 700; }
+.font-extrabold { font-weight: 800; }
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.leading-relaxed { line-height: 1.625; }
+.italic { font-style: italic; }
+.underline { text-decoration: underline; }
+.select-none { user-select: none; }
+
+/* Colors - Text */
+.text-white { color: #fff; }
+.text-black { color: #000; }
+.text-gray-400 { color: #9ca3af; }
+.text-gray-500 { color: #6b7280; }
+.text-gray-600 { color: #4b5563; }
+.text-gray-700 { color: #374151; }
+.text-gray-800 { color: #1f2937; }
+.text-gray-900 { color: #111827; }
+.text-red-400 { color: #f87171; }
+.text-red-600 { color: #dc2626; }
+.text-red-700 { color: #b91c1c; }
+.text-amber-500 { color: #f59e0b; }
+.text-amber-600 { color: #d97706; }
+.text-amber-700 { color: #b45309; }
+.text-amber-800 { color: #92400e; }
+.text-orange-500 { color: #f97316; }
+.text-orange-600 { color: #ea580c; }
+.text-orange-700 { color: #c2410c; }
+.text-emerald-500 { color: #10b981; }
+.text-emerald-600 { color: #059669; }
+.text-emerald-700 { color: #047857; }
+.text-teal-600 { color: #0d9488; }
+.text-teal-700 { color: #0f766e; }
+.text-blue-500 { color: #3b82f6; }
+.text-blue-600 { color: #2563eb; }
+.text-blue-700 { color: #1d4ed8; }
+.text-indigo-500 { color: #6366f1; }
+.text-indigo-600 { color: #4f46e5; }
+.text-indigo-700 { color: #4338ca; }
+.text-purple-500 { color: #a855f7; }
+.text-purple-600 { color: #9333ea; }
+.text-purple-700 { color: #7e22ce; }
+.text-purple-800 { color: #6b21a8; }
+.text-pink-500 { color: #ec4899; }
+.text-pink-600 { color: #db2777; }
+.text-pink-700 { color: #be185d; }
+.text-green-500 { color: #22c55e; }
+.text-green-600 { color: #16a34a; }
+.text-green-700 { color: #15803d; }
+
+/* Opacity text modifiers */
+.text-white\/70 { color: rgba(255,255,255,0.7); }
+.text-white\/50 { color: rgba(255,255,255,0.5); }
+.text-white\/30 { color: rgba(255,255,255,0.3); }
+.text-gray-400\/50 { color: rgba(156,163,175,0.5); }
+
+/* Colors - Background */
+.bg-white { background-color: #fff; }
+.bg-black { background-color: #000; }
+.bg-gray-50 { background-color: #f9fafb; }
+.bg-gray-100 { background-color: #f3f4f6; }
+.bg-gray-200 { background-color: #e5e7eb; }
+.bg-white\/30 { background-color: rgba(255,255,255,0.3); }
+.bg-amber-50 { background-color: #fffbeb; }
+.bg-amber-100 { background-color: #fef3c7; }
+.bg-amber-400 { background-color: #fbbf24; }
+.bg-amber-500 { background-color: #f59e0b; }
+.bg-amber-600 { background-color: #d97706; }
+.bg-orange-100 { background-color: #ffedd5; }
+.bg-orange-200 { background-color: #fed7aa; }
+.bg-orange-500 { background-color: #f97316; }
+.bg-orange-600 { background-color: #ea580c; }
+.bg-emerald-50 { background-color: #ecfdf5; }
+.bg-emerald-100 { background-color: #d1fae5; }
+.bg-emerald-500 { background-color: #10b981; }
+.bg-emerald-600 { background-color: #059669; }
+.bg-red-50 { background-color: #fef2f2; }
+.bg-pink-50 { background-color: #fdf2f8; }
+.bg-pink-100 { background-color: #fce7f3; }
+.bg-pink-200 { background-color: #fbcfe8; }
+.bg-blue-50 { background-color: #eff6ff; }
+.bg-blue-100 { background-color: #dbeafe; }
+.bg-indigo-50 { background-color: #eef2ff; }
+.bg-indigo-100 { background-color: #e0e7ff; }
+.bg-indigo-500 { background-color: #6366f1; }
+.bg-purple-50 { background-color: #faf5ff; }
+.bg-purple-100 { background-color: #f3e8ff; }
+.bg-green-50 { background-color: #f0fdf4; }
+.bg-green-400 { background-color: #4ade80; }
+
+/* Backgrounds with opacity */
+.bg-amber-50\/30 { background-color: rgba(255,251,235,0.3); }
+
+/* Gradients */
+.bg-gradient-to-r { background-image: linear-gradient(to right, var(--tw-gradient-from), var(--tw-gradient-to)); }
+.bg-gradient-to-br { background-image: linear-gradient(to bottom right, var(--tw-gradient-from), var(--tw-gradient-to)); }
+.from-amber-400 { --tw-gradient-from: #fbbf24; }
+.from-amber-50 { --tw-gradient-from: #fffbeb; }
+.to-orange-100 { --tw-gradient-to: #ffedd5; }
+.to-orange-500 { --tw-gradient-to: #f97316; }
+.to-amber-50 { --tw-gradient-to: #fffbeb; }
+.to-orange-50 { --tw-gradient-to: #fff7ed; }
+.from-indigo-500 { --tw-gradient-from: #6366f1; }
+.to-purple-600 { --tw-gradient-to: #9333ea; }
+.from-purple-50 { --tw-gradient-from: #faf5ff; }
+.to-indigo-50 { --tw-gradient-to: #eef2ff; }
+.from-emerald-50 { --tw-gradient-from: #ecfdf5; }
+.to-teal-50 { --tw-gradient-to: #f0fdfa; }
+.from-pink-50 { --tw-gradient-from: #fdf2f8; }
+.to-rose-100 { --tw-gradient-to: #ffe4e6; }
+.from-green-50 { --tw-gradient-from: #f0fdf4; }
+
+/* Borders */
+.border { border-width: 1px; border-style: solid; border-color: #e5e7eb; }
+.border-0 { border-width: 0; }
+.border-t { border-top-width: 1px; border-style: solid; border-color: #e5e7eb; }
+.border-gray-100 { border-color: #f3f4f6; }
+.border-gray-200 { border-color: #e5e7eb; }
+.border-amber-200 { border-color: #fde68a; }
+.border-amber-300 { border-color: #fcd34d; }
+.border-orange-200 { border-color: #fed7aa; }
+.border-emerald-200 { border-color: #a7f3d0; }
+.border-green-200 { border-color: #bbf7d0; }
+.border-red-200 { border-color: #fecaca; }
+.border-red-300 { border-color: #fca5a1; }
+.border-purple-200 { border-color: #e9d5ff; }
+.border-indigo-100 { border-color: #e0e7ff; }
+.border-indigo-200 { border-color: #c7d2fe; }
+.border-pink-200 { border-color: #f9a8d4; }
+.border-white\/20 { border-color: rgba(255,255,255,0.2); }
+
+/* Border Radius */
+.rounded { border-radius: 0.25rem; }
+.rounded-lg { border-radius: 0.5rem; }
+.rounded-xl { border-radius: 0.75rem; }
+.rounded-2xl { border-radius: 1rem; }
+.rounded-full { border-radius: 9999px; }
+
+/* Shadows */
+.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
+.shadow { box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1); }
+.shadow-md { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1); }
+
+/* Overflow */
+.overflow-x-hidden { overflow-x: hidden; }
+.overflow-hidden { overflow: hidden; }
+
+/* Cursor */
+.cursor-pointer { cursor: pointer; }
+.cursor-not-allowed { cursor: not-allowed; }
+
+/* Transitions */
+.transition { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+.transition-transform { transition-property: transform; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+.duration-200 { transition-duration: 200ms; }
+
+/* Hover */
+.hover\:shadow-md:hover { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); }
+.hover\:shadow-lg:hover { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1); }
+.hover\:bg-amber-200:hover { background-color: #fde68a; }
+.hover\:bg-amber-600:hover { background-color: #d97706; }
+.hover\:bg-indigo-600:hover { background-color: #4f46e5; }
+.hover\:bg-emerald-200:hover { background-color: #a7f3d0; }
+.hover\:bg-emerald-600:hover { background-color: #059669; }
+.hover\:bg-rose-600:hover { background-color: #e11d48; }
+.hover\:bg-gray-200:hover { background-color: #e5e7eb; }
+.hover\:border-amber-300:hover { border-color: #fcd34d; }
+.hover\:text-gray-600:hover { color: #4b5563; }
+.hover\:text-red-400:hover { color: #f87171; }
+.hover\:opacity-80:hover { opacity: 0.8; }
+
+/* Focus */
+.focus\:outline-none:focus { outline: 0; }
+.focus\:ring-2:focus { outline: 2px solid transparent; }
+.focus\:ring-amber-300:focus { --tw-ring-color: #fcd34d; outline-offset: 2px; box-shadow: 0 0 0 2px #fcd34d; }
+.focus\:ring-indigo-300:focus { --tw-ring-color: #a5b4fc; outline-offset: 2px; box-shadow: 0 0 0 2px #a5b4fc; }
+.focus\:ring-purple-300:focus { --tw-ring-color: #d8b4fe; outline-offset: 2px; box-shadow: 0 0 0 2px #d8b4fe; }
+
+/* Select none */
+.select-none { user-select: none; }
+
+/* Resize */
+.resize-none { resize: none; }
+
+/* Misc */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.whitespace-nowrap { white-space: nowrap; }
+.break-words { overflow-wrap: break-word; }
+.inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+
+/* Custom font sizes used in app */
+.text-\[10px\] { font-size: 10px; line-height: 14px; }
+.text-\[10px\]\.text-white\/50 { font-size: 10px; color: rgba(255,255,255,0.5); }
+
+</style>
+<meta name="theme-color" content="#4F46E5">
+</head>
+<body>
+<div id="app"></div>
+<script>
+// Kill any Service Workers first
+if("serviceWorker"in navigator){navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(w){w.unregister();});});}
+if("caches"in window){caches.keys().then(function(n){n.forEach(function(k){caches.delete(k);});});}
+</script>
+<script>
+window.APP_DATA = {
+  yanghua: {
+    name: "Adult",
+    label: "\u6210\u4eba",
+    emoji: "\ud83d\udc69\u200d\ud83c\udf93",
+    desc: "\u751f\u6d3b\u573a\u666f\u00b78\u4e2a\u8bed\u8a00\u5c9b\u00b7160\u53e5",
+    color: "#EC4899",
+    bg: "#FDF2F8",
+    voice: { lang: "en-US", name: "Samantha", pitch: 1.0, rate: 0.9 },
+    islands: [
+      {
+        name: "\u65e5\u5e38\u8d77\u5c45",
+        nameEn: "Daily Routine",
+        icon: "\u2601\ufe0f",
+        sentences: [{en:"I wake up at six o'clock every morning.",zh:"我每天早上六点起床。"},
+{en:"I usually have coffee and toast for breakfast.",zh:"我早餐通常喝咖啡吃吐司。"},
+{en:"I need to leave for work by seven thirty.",zh:"我七点半前得出门上班。"},
+{en:"What time do you usually go to bed?",zh:"你通常几点睡觉？"},
+{en:"I'm going to take a shower now.",zh:"我现在去洗个澡。"},
+{en:"Can you help me set the alarm for tomorrow?",zh:"你能帮我设一下明天的闹钟吗？"},
+{en:"It takes me about twenty minutes to get ready.",zh:"我大概需要二十分钟准备出门。"},
+{en:"I like to read for a while before going to sleep.",zh:"我喜欢睡前看一会儿书。"},
+{en:"I overslept this morning.",zh:"今早我睡过头了。"},
+{en:"I need to do some laundry today.",zh:"我今天得洗些衣服。"},
+{en:"The weather is nice today, let's go for a walk.",zh:"今天天气不错，我们出去走走吧。"},
+{en:"Can you turn off the lights, please?",zh:"请把灯关一下好吗？"},
+{en:"I usually check my phone first thing in the morning.",zh:"我早上第一件事就是看手机。"},
+{en:"Don't forget to take out the trash.",zh:"别忘了把垃圾丢出去。"},
+{en:"I'm going to take a nap after lunch.",zh:"午饭后我要小睡一会儿。"},
+{en:"What are your plans for this weekend?",zh:"你周末有什么计划？"},
+{en:"I always lock the door before I leave.",zh:"我出门前都会锁门。"},
+{en:"The air conditioning is not working.",zh:"空调坏了。"},
+{en:"I need to buy some cleaning supplies.",zh:"我需要买些清洁用品。"},
+{en:"It's already midnight, I should go to bed.",zh:"已经午夜了，我该睡觉了。"}]
+      },
+      {
+        name: "\u996e\u98df\u4e0e\u70f9\u996a",
+        nameEn: "Food & Cooking",
+        icon: "\ud83c\udf73",
+        sentences: [{en:"What would you like to eat for dinner?",zh:"晚饭你想吃什么？"},
+{en:"I'm going to cook some stir-fried vegetables tonight.",zh:"今晚我打算炒些蔬菜。"},
+{en:"Can you pass me the salt, please?",zh:"请把盐递给我好吗？"},
+{en:"This dish is delicious! What's in it?",zh:"这道菜太好吃了！里面放了什么？"},
+{en:"I prefer my coffee with a little sugar.",zh:"我喝咖啡喜欢加一点糖。"},
+{en:"Let's order some takeout, I don't feel like cooking.",zh:"我们点外卖吧，我不想做饭了。"},
+{en:"Do you have any dietary restrictions?",zh:"你有什么饮食禁忌吗？"},
+{en:"The soup needs a bit more seasoning.",zh:"这汤还需要再多加点调料。"},
+{en:"I'll make some rice and steamed fish for lunch.",zh:"午饭我做米饭和清蒸鱼。"},
+{en:"Would you like another cup of tea?",zh:"再喝一杯茶吗？"},
+{en:"I'm trying to eat more vegetables these days.",zh:"这些天我在尽量多吃蔬菜。"},
+{en:"Can you help me chop these onions?",zh:"你能帮我切一下洋葱吗？"},
+{en:"Let's try that new restaurant down the street.",zh:"我们去试试街角那家新开的餐厅吧。"},
+{en:"I usually skip breakfast on busy mornings.",zh:"忙的时候我经常不吃早餐。"},
+{en:"The food here is really authentic.",zh:"这里的菜真的很地道。"},
+{en:"Do you know how to make hotpot at home?",zh:"你会在家做火锅吗？"},
+{en:"I bought some fresh fruits at the market.",zh:"我在市场买了一些新鲜水果。"},
+{en:"This tastes even better than last time.",zh:"这比上次做的还好吃。"},
+{en:"Let's save the leftovers for tomorrow.",zh:"我们把剩菜留着明天吃吧。"},
+{en:"I'm in the mood for something spicy today.",zh:"今天我想吃点辣的。"}]
+      },
+      {
+        name: "\u793e\u4ea4\u4e0e\u95f2\u804a",
+        nameEn: "Social & Chat",
+        icon: "\ud83d\udc4b",
+        sentences: [{en:"Nice to meet you! Where are you from?",zh:"很高兴认识你！你是哪里人？"},
+{en:"What do you do for a living?",zh:"你是做什么工作的？"},
+{en:"How long have you been living in Haikou?",zh:"你在海口住了多久了？"},
+{en:"The weather here is so nice all year round.",zh:"这里一年四季天气都很好。"},
+{en:"Do you have any hobbies?",zh:"你有什么爱好吗？"},
+{en:"I work at a maternal and child health center.",zh:"我在妇幼保健所工作。"},
+{en:"Have you been to any interesting places lately?",zh:"最近有没有去什么有趣的地方？"},
+{en:"Let me introduce you to my colleague.",zh:"我给你介绍一下我的同事。"},
+{en:"That's a great idea! I totally agree with you.",zh:"好主意！我完全同意你的看法。"},
+{en:"I'm originally from Hunan, but I moved here a few years ago.",zh:"我老家是湖南的，几年前搬到这儿来了。"},
+{en:"What do you usually do on weekends?",zh:"你周末通常做什么？"},
+{en:"Long time no see! How have you been?",zh:"好久不见！你最近怎么样？"},
+{en:"I really enjoy living in Hainan.",zh:"我很喜欢住在海南。"},
+{en:"Can I add you on WeChat?",zh:"我能加你微信吗？"},
+{en:"She is one of my closest friends.",zh:"她是我最要好的朋友之一。"},
+{en:"I heard there's a new coffee shop nearby.",zh:"听说附近开了一家新咖啡店。"},
+{en:"We should get together sometime soon.",zh:"我们最近应该聚一聚。"},
+{en:"I'm not really into sports, but I like walking.",zh:"我不太爱运动，但喜欢散步。"},
+{en:"That reminds me of a funny story.",zh:"这让我想起一件有趣的事。"},
+{en:"It was great talking to you. See you next time!",zh:"和你聊天很愉快，下次见！"}]
+      },
+      {
+        name: "\u8d2d\u7269\u4e0e\u6d88\u8d39",
+        nameEn: "Shopping",
+        icon: "\ud83d\uded2",
+        sentences: [{en:"How much is this?",zh:"这个多少钱？"},
+{en:"Do you accept mobile payment?",zh:"可以用手机支付吗？"},
+{en:"Can I try this on?",zh:"我可以试穿一下吗？"},
+{en:"Is there any discount today?",zh:"今天有折扣吗？"},
+{en:"I'm just looking, thanks.",zh:"我只是看看，谢谢。"},
+{en:"Do you have this in a different color?",zh:"这个有其他颜色吗？"},
+{en:"I'd like to return this item, please.",zh:"我想退掉这件商品。"},
+{en:"The quality is really good for the price.",zh:"这个价格来说质量真的很好。"},
+{en:"Can you give me a receipt?",zh:"请给我一张收据。"},
+{en:"Is this on sale?",zh:"这个在打折吗？"},
+{en:"I need to buy some groceries for the week.",zh:"我需要买些一周的菜。"},
+{en:"Where is the fitting room?",zh:"试衣间在哪里？"},
+{en:"Do you have anything cheaper?",zh:"有便宜一点的吗？"},
+{en:"I'll take two of these, please.",zh:"我要两个这个。"},
+{en:"Can you wrap this as a gift?",zh:"能把这个包装成礼品吗？"},
+{en:"The supermarket is just around the corner.",zh:"超市就在拐角处。"},
+{en:"I prefer shopping online these days.",zh:"我最近更喜欢网购。"},
+{en:"This one doesn't fit me well.",zh:"这个不太合身。"},
+{en:"Do you deliver to this address?",zh:"你们送到这个地址吗？"},
+{en:"I spent too much money today.",zh:"今天花太多钱了。"}]
+      },
+      {
+        name: "\u4ea4\u901a\u51fa\u884c",
+        nameEn: "Transport",
+        icon: "\ud83d\ude97",
+        sentences: [{en:"How do I get to the train station from here?",zh:"从这儿去火车站怎么走？"},
+{en:"Is there a bus stop nearby?",zh:"附近有公交站吗？"},
+{en:"How long does it take by taxi?",zh:"打车需要多长时间？"},
+{en:"I missed the bus. When is the next one?",zh:"我没赶上公交，下一班什么时候？"},
+{en:"Can you call a taxi for me, please?",zh:"你能帮我叫一辆出租车吗？"},
+{en:"The traffic is really heavy right now.",zh:"现在路况真的很堵。"},
+{en:"I usually ride my e-bike to work.",zh:"我通常骑电动车上班。"},
+{en:"Which platform does the train leave from?",zh:"火车从哪个站台出发？"},
+{en:"Is this seat taken?",zh:"这个座位有人吗？"},
+{en:"How much is the fare?",zh:"车费多少钱？"},
+{en:"I need to buy a round-trip ticket.",zh:"我需要买一张往返票。"},
+{en:"The subway is much faster during rush hour.",zh:"高峰时段地铁快多了。"},
+{en:"Can you drop me off at the corner?",zh:"能在拐角让我下车吗？"},
+{en:"I'm running a bit late today.",zh:"我今天有点晚了。"},
+{en:"Where is the nearest parking lot?",zh:"最近的停车场在哪里？"},
+{en:"I prefer taking the high-speed train.",zh:"我更愿意坐高铁。"},
+{en:"Let me check the map for directions.",zh:"我看看地图导航。"}]
+      },
+      {
+        name: "\u5065\u5eb7\u4e0e\u533b\u7597",
+        nameEn: "Health & Medical",
+        icon: "\ud83c\udfe5",
+        sentences: [{en:"I have a headache. Can you recommend some medicine?",zh:"我头疼，能推荐些药吗？"},
+{en:"I need to make an appointment with the doctor.",zh:"我需要预约看医生。"},
+{en:"My throat has been sore for two days.",zh:"我嗓子疼了两天了。"},
+{en:"Do I need to fast before the blood test?",zh:"抽血前需要空腹吗？"},
+{en:"I'm allergic to penicillin.",zh:"我对青霉素过敏。"},
+{en:"The doctor said I should get more rest.",zh:"医生说我应该多休息。"},
+{en:"How many times a day should I take this medicine?",zh:"这个药一天吃几次？"},
+{en:"I've been feeling very tired lately.",zh:"我最近一直觉得很累。"},
+{en:"Is there a pharmacy nearby?",zh:"附近有药店吗？"},
+{en:"I need to get my annual checkup done.",zh:"我需要做年度体检。"},
+{en:"The fever has gone down, but I still have a cough.",zh:"烧退了，但还在咳嗽。"},
+{en:"My blood pressure is a bit high.",zh:"我的血压有点高。"},
+{en:"I twisted my ankle while walking.",zh:"走路时扭了脚。"},
+{en:"When should I come back for a follow-up?",zh:"什么时候来复查？"},
+{en:"Make sure to drink plenty of water.",zh:"一定要多喝水。"},
+{en:"I'd like to schedule a vaccination.",zh:"我想预约接种疫苗。"},
+{en:"The symptoms started about three days ago.",zh:"症状大约三天前开始的。"},
+{en:"Do you have a family history of diabetes?",zh:"有糖尿病家族史吗？"},
+{en:"I've been exercising more to stay healthy.",zh:"我最近多运动来保持健康。"},
+{en:"Remember to take your medicine after meals.",zh:"记得饭后吃药。"}]
+      },
+      {
+        name: "\u65c5\u884c\u4e0e\u4f4f\u5bbf",
+        nameEn: "Travel & Hotel",
+        icon: "\u2708\ufe0f",
+        sentences: [{en:"I'd like to book a room for two nights, please.",zh:"我想订两晚的房间。"},
+{en:"Is breakfast included?",zh:"含早餐吗？"},
+{en:"What time is check-in?",zh:"几点可以入住？"},
+{en:"Can I have a late check-out?",zh:"可以延迟退房吗？"},
+{en:"Is there WiFi in the room?",zh:"房间有WiFi吗？"},
+{en:"Where is the nearest tourist attraction?",zh:"最近的景点在哪里？"},
+{en:"I'd like to rent a car for the day.",zh:"我想租一天车。"},
+{en:"Can you recommend a good local restaurant?",zh:"能推荐一家当地的好餐厅吗？"},
+{en:"How do I get to the beach from here?",zh:"从这儿去海滩怎么走？"},
+{en:"The view from the room is amazing.",zh:"房间的风景很棒。"},
+{en:"I need to change my flight to a later date.",zh:"我需要把航班改到更晚的日期。"},
+{en:"Do you have any tours available?",zh:"你们有旅游团可以参加吗？"},
+{en:"I'd like a room with a sea view, please.",zh:"请给我一间海景房。"},
+{en:"Is the swimming pool open all day?",zh:"泳池全天开放吗？"},
+{en:"Can you call a taxi to the airport?",zh:"能叫一辆去机场的出租车吗？"},
+{en:"What are the must-see places in this city?",zh:"这座城市有哪些必去的地方？"}]
+      },
+      {
+        name: "\u5174\u8da3\u4e0e\u81ea\u6211\u8868\u8fbe",
+        nameEn: "Hobbies & Self-Expression",
+        icon: "\ud83c\udfa8",
+        sentences: [{en:"In my free time, I enjoy reading and cooking.",zh:"空闲时我喜欢阅读和做饭。"},
+{en:"I've been learning English for a few months now.",zh:"我学英语已经几个月了。"},
+{en:"Music helps me relax after a long day at work.",zh:"音乐让我在忙碌一天后放松下来。"},
+{en:"I'd like to travel more in the future.",zh:"将来我想多旅行。"},
+{en:"I think learning new things keeps you young.",zh:"我觉得学习新东西能让人保持年轻。"},
+{en:"I'm interested in traditional Chinese medicine.",zh:"我对中医很感兴趣。"},
+{en:"Reading is my favorite way to unwind.",zh:"阅读是我最喜欢的放松方式。"},
+{en:"I want to improve my English so I can travel abroad.",zh:"我想提高英语水平，将来能出国旅行。"},
+{en:"I believe health is the most important thing in life.",zh:"我认为健康是人生中最重要的。"},
+{en:"I enjoy watching documentaries about nature.",zh:"我喜欢看自然纪录片。"},
+{en:"I've been trying to learn more about nutrition.",zh:"我最近在多了解营养学知识。"},
+{en:"Sometimes I write in a journal before bed.",zh:"有时候我睡前会写日记。"},
+{en:"I find gardening very therapeutic.",zh:"我觉得园艺很有疗愈效果。"},
+{en:"My dream is to visit Europe someday.",zh:"我的梦想是有一天去欧洲。"},
+{en:"I think it's never too late to learn something new.",zh:"我觉得学什么都不会太晚。"},
+{en:"I like to practice English by talking to myself.",zh:"我喜欢自言自语来练习英语。"},
+{en:"Cooking for my family makes me happy.",zh:"为家人做饭让我感到幸福。"},
+{en:"I want to set a good example for my child.",zh:"我想给孩子做个好榜样。"},
+{en:"I feel grateful for everything in my life.",zh:"我感恩生活中的一切。"},
+{en:"I'm working on becoming a better version of myself.",zh:"我正在努力成为更好的自己。"}]
+      }
+    ]
+  },
+  mumu: {
+    name: "Child",
+    label: "\u513f\u7ae5",
+    emoji: "\ud83d\udc66",
+    desc: "\u5b66\u6821+\u5174\u8da3+\u5bb6\u5ead\u00b78\u4e2a\u8bed\u8a00\u5c9b\u00b7148\u53e5",
+    color: "#F59E0B",
+    bg: "#FFFBEB",
+    voice: { lang: "en-US", name: "Junior", pitch: 1.0, rate: 0.85 },
+    islands: [
+      {
+        name: "\u5b66\u6821\u65e5\u5e38",
+        nameEn: "School Daily",
+        icon: "\ud83c\udfeb",
+        sentences: [{en:"Good morning, teacher.",zh:"老师早上好。"},
+{en:"May I come in?",zh:"我可以进来吗？"},
+{en:"May I go to the bathroom?",zh:"我可以去洗手间吗？"},
+{en:"I don't understand. Can you explain again?",zh:"我不明白，能再讲一遍吗？"},
+{en:"Can I borrow a pencil?",zh:"能借我一支铅笔吗？"},
+{en:"I forgot my homework at home.",zh:"我把作业忘在家了。"},
+{en:"When is the next class?",zh:"下一节课是什么时候？"},
+{en:"It's time for lunch.",zh:"该吃午饭了。"},
+{en:"Let's go play on the playground.",zh:"我们去操场玩吧！"},
+{en:"School is over. Let's go home.",zh:"放学了，我们回家吧。"},
+{en:"I need to go to the library.",zh:"我需要去图书馆。"},
+{en:"The bell is ringing. Let's line up.",zh:"打铃了，我们排队吧。"},
+{en:"I like art class the most.",zh:"我最喜欢上美术课。"},
+{en:"Can you help me with this problem?",zh:"你能帮我看看这道题吗？"},
+{en:"I finished my homework.",zh:"我做完作业了。"},
+{en:"Today's lunch is delicious.",zh:"今天的午饭很好吃。"},
+{en:"I got an A on my test!",zh:"我考试得了A！"},
+{en:"We have PE class this afternoon.",zh:"今天下午有体育课。"},
+{en:"I need to buy a new notebook.",zh:"我需要买一个新笔记本。"},
+{en:"Let's review for the exam together.",zh:"我们一起复习考试吧。"}]
+      },
+      {
+        name: "\u8bfe\u5802\u56de\u7b54\u4e0e\u63d0\u95ee",
+        nameEn: "Classroom Q&A",
+        icon: "\ud83d\udcdd",
+        sentences: [{en:"I know the answer! It's...",zh:"我知道答案！是……"},
+{en:"Can I ask a question?",zh:"我能问个问题吗？"},
+{en:"I think the answer is twelve.",zh:"我觉得答案是十二。"},
+{en:"I'm not sure about this one.",zh:"这道我不太确定。"},
+{en:"May I speak, please?",zh:"我能发言吗？"},
+{en:"What page are we on?",zh:"我们翻到哪一页了？"},
+{en:"I don't know how to spell this word.",zh:"我不知道这个词怎么拼。"},
+{en:"Can you repeat that, please?",zh:"能再说一遍吗？"},
+{en:"I agree with what he said.",zh:"我同意他说的。"},
+{en:"I have a different idea.",zh:"我有一个不同的想法。"},
+{en:"Could you speak a little slower, please?",zh:"能说慢一点吗？"},
+{en:"What does this word mean?",zh:"这个词是什么意思？"},
+{en:"I need more time to think.",zh:"我需要多想一会儿。"},
+{en:"The answer is wrong. Let me try again.",zh:"答案错了，让我再试一次。"},
+{en:"I understand now. Thank you!",zh:"我现在明白了，谢谢！"},
+{en:"Can I share my answer with the class?",zh:"我可以和全班分享我的答案吗？"},
+{en:"I think I made a mistake here.",zh:"我觉得这里我弄错了。"},
+{en:"That's a very good question!",zh:"这是一个很好的问题！"}]
+      },
+      {
+        name: "\u540c\u5b66\u793e\u4ea4",
+        nameEn: "Friends",
+        icon: "\ud83e\udd1d",
+        sentences: [{en:"Do you want to play together?",zh:"你想一起玩吗？"},
+{en:"Let's be friends!",zh:"我们做朋友吧！"},
+{en:"Can I sit next to you?",zh:"我能坐在你旁边吗？"},
+{en:"What's your favorite game?",zh:"你最喜欢的游戏是什么？"},
+{en:"That was really fun!",zh:"刚才真的好好玩！"},
+{en:"I'm sorry. I didn't mean to.",zh:"对不起，我不是故意的。"},
+{en:"Let's play hide and seek.",zh:"我们玩捉迷藏吧。"},
+{en:"You're really good at this!",zh:"你真的很厉害！"},
+{en:"Want to trade snacks?",zh:"要交换零食吗？"},
+{en:"I'll save you a seat.",zh:"我帮你占座。"},
+{en:"See you tomorrow!",zh:"明天见！"},
+{en:"Good luck on the test!",zh:"考试加油！"},
+{en:"That's so funny!",zh:"太好笑了！"},
+{en:"Can I join your team?",zh:"我能加入你的队伍吗？"},
+{en:"Let me help you with that.",zh:"让我帮你吧。"},
+{en:"You're my best friend.",zh:"你是我最好的朋友。"},
+{en:"Do you want to come to my house?",zh:"想来我家玩吗？"},
+{en:"I was thinking about you.",zh:"我想你了。"},
+{en:"Let's play after school.",zh:"放学后一起玩吧。"},
+{en:"Don't tell anyone, okay?",zh:"别告诉别人，好吗？"}]
+      },
+      {
+        name: "\u5bb6\u5ead\u65e5\u5e38",
+        nameEn: "Family Daily",
+        icon: "\ud83c\udfe0",
+        sentences: [{en:"Mom, I'm home!",zh:"妈妈，我回来了！"},
+{en:"What's for dinner tonight?",zh:"今晚吃什么？"},
+{en:"Can I watch TV for a little while?",zh:"我能看一会儿电视吗？"},
+{en:"I need help with my homework.",zh:"我需要你帮我辅导作业。"},
+{en:"Can I have some water, please?",zh:"能给我倒点水吗？"},
+{en:"I finished all my homework.",zh:"我作业全做完了。"},
+{en:"It's time to take a bath.",zh:"该洗澡了。"},
+{en:"Good night, Mom. Good night, Dad.",zh:"晚安，妈妈。晚安，爸爸。"},
+{en:"Can I invite my friend over?",zh:"我能邀请朋友来家里吗？"},
+{en:"I'm hungry. Is there anything to eat?",zh:"我饿了，有什么吃的吗？"},
+{en:"I can't find my school bag.",zh:"我找不到书包了。"},
+{en:"Mom, can you buy me a new toy?",zh:"妈妈，能给我买个新玩具吗？"},
+{en:"Let me help you set the table.",zh:"让我帮你摆碗筷吧。"},
+{en:"I cleaned my room today.",zh:"我今天打扫了房间。"},
+{en:"Can we go to the park this weekend?",zh:"这周末能去公园吗？"},
+{en:"I got a star from my teacher today!",zh:"今天老师奖了我一颗星！"},
+{en:"Dad, look what I made!",zh:"爸爸，看我做的东西！"},
+{en:"Can I play on the tablet for ten minutes?",zh:"我能玩十分钟平板吗？"},
+{en:"I love our family.",zh:"我爱我们家。"},
+{en:"What day is it today?",zh:"今天星期几？"}]
+      },
+      {
+        name: "\u5bb6\u5ead\u60c5\u611f\u8868\u8fbe",
+        nameEn: "Family Feelings",
+        icon: "\u2764\ufe0f",
+        sentences: [{en:"I love you, Mom.",zh:"妈妈我爱你。"},
+{en:"Thank you for helping me.",zh:"谢谢你帮我。"},
+{en:"I'm sorry I was naughty today.",zh:"对不起，今天我调皮了。"},
+{en:"I'm so happy today!",zh:"今天我好开心！"},
+{en:"I miss Grandpa and Grandma.",zh:"我想爷爷奶奶了。"},
+{en:"Mom, you're the best!",zh:"妈妈，你是最好的！"},
+{en:"I feel sad because my friend is sick.",zh:"我朋友生病了，我很难过。"},
+{en:"I'm proud of myself!",zh:"我为自己感到骄傲！"},
+{en:"Can I give you a hug?",zh:"我能抱你一下吗？"},
+{en:"You look pretty today, Mom.",zh:"妈妈，你今天好漂亮。"},
+{en:"I was scared of the dark last night.",zh:"昨晚我怕黑了。"},
+{en:"I'm excited about the weekend!",zh:"我对周末很期待！"},
+{en:"Dad, can we play together?",zh:"爸爸，我们一起玩好吗？"},
+{en:"I feel much better now.",zh:"我现在感觉好多了。"},
+{en:"Thank you for the delicious food.",zh:"谢谢您做了这么好吃的饭菜。"},
+{en:"I want to make you proud.",zh:"我想让你们为我骄傲。"},
+{en:"I feel nervous about the test tomorrow.",zh:"我有点紧张，明天要考试。"},
+{en:"I had a really good day at school.",zh:"今天在学校度过了很棒的一天。"}]
+      },
+      {
+        name: "\u640f\u51fb\u8bfe",
+        nameEn: "Martial Arts",
+        icon: "\ud83e\udd4a",
+        sentences: [{en:"Coach, I'm ready!",zh:"教练，我准备好了！"},
+{en:"Let me try that move again.",zh:"让我再试一次那个动作。"},
+{en:"I need to practice my left hook.",zh:"我需要多练左钩拳。"},
+{en:"That was a great kick!",zh:"那一踢太漂亮了！"},
+{en:"Keep your hands up!",zh:"双手举起来！"},
+{en:"My legs are sore from yesterday's training.",zh:"昨天训练完我腿很酸痛。"},
+{en:"I want to learn that combo.",zh:"我想学那套组合拳。"},
+{en:"Can we do some sparring today?",zh:"今天能对练吗？"},
+{en:"I need to improve my footwork.",zh:"我需要改善步法。"},
+{en:"Coach, did I do that right?",zh:"教练，我做得对吗？"},
+{en:"Let's warm up first.",zh:"我们先热身。"},
+{en:"I'm getting better at blocking!",zh:"我的防守越来越好了！"},
+{en:"That punch was really fast!",zh:"那一拳好快！"},
+{en:"I feel stronger than last week.",zh:"我比上周感觉更强壮了。"},
+{en:"Can you show me that technique one more time?",zh:"能再示范一次那个动作吗？"},
+{en:"Good job! Keep it up!",zh:"做得好！继续保持！"},
+{en:"Time to cool down and stretch.",zh:"该放松拉伸了。"}]
+      },
+      {
+        name: "\u8fd0\u52a8\u4e0e\u6e38\u620f",
+        nameEn: "Sports & Games",
+        icon: "\u26bd",
+        sentences: [{en:"Let's play soccer!",zh:"踢足球吧！"},
+{en:"Pass the ball to me!",zh:"传给我！"},
+{en:"That was a great goal!",zh:"那个球进得太漂亮了！"},
+{en:"I want to be on that team.",zh:"我想进那个队。"},
+{en:"Let's play basketball after school.",zh:"放学后打篮球吧。"},
+{en:"I love swimming in the summer.",zh:"夏天我最爱游泳。"},
+{en:"Can we ride our bikes to the park?",zh:"能骑车去公园吗？"},
+{en:"I ran really fast today!",zh:"今天我跑得真快！"},
+{en:"Let's play tag. You're it!",zh:"玩抓人游戏吧，轮到你抓了！"},
+{en:"I want to learn to ride a skateboard.",zh:"我想学滑板。"},
+{en:"Which sport is your favorite?",zh:"你最喜欢什么运动？"},
+{en:"I scored three points today!",zh:"今天我得了三分！"},
+{en:"The water is too cold for swimming.",zh:"水太冷了不能游泳。"},
+{en:"Let's have a race!",zh:"我们赛跑吧！"},
+{en:"I need to stretch before I run.",zh:"跑步前我需要拉伸。"},
+{en:"We won the game! Hooray!",zh:"我们赢了！耶！"},
+{en:"I like playing video games too.",zh:"我也喜欢玩电子游戏。"},
+{en:"Shall we play chess?",zh:"我们下棋吧？"},
+{en:"I caught the ball!",zh:"我接到球了！"}]
+      },
+      {
+        name: "\u52a8\u7269\u4e0e\u81ea\u7136",
+        nameEn: "Animals & Nature",
+        icon: "\ud83e\udd8c",
+        sentences: [{en:"I love cats. They're so cute!",zh:"我喜欢猫咪，太可爱了！"},
+{en:"Look at that butterfly!",zh:"看那只蝴蝶！"},
+{en:"The dog is wagging its tail.",zh:"狗狗在摇尾巴。"},
+{en:"I want to see the dolphins at the aquarium.",zh:"我想去水族馆看海豚。"},
+{en:"What's your favorite animal?",zh:"你最喜欢的动物是什么？"},
+{en:"The sunset is so beautiful today.",zh:"今天的日落好美。"},
+{en:"I can hear the birds singing.",zh:"我能听到鸟儿在唱歌。"},
+{en:"It's raining outside. Let's stay in.",zh:"外面下雨了，我们待在屋里吧。"},
+{en:"Look at the stars tonight!",zh:"看今晚的星星！"},
+{en:"The flowers in the garden are blooming.",zh:"花园里的花都开了。"},
+{en:"I saw a squirrel in the park.",zh:"我在公园看到了一只松鼠。"},
+{en:"The ocean is so blue and clear.",zh:"大海好蓝好清澈。"},
+{en:"I want to plant a tree.",zh:"我想种一棵树。"},
+{en:"The caterpillar turned into a butterfly!",zh:"毛毛虫变成蝴蝶了！"},
+{en:"Let's go catch some fish.",zh:"我们去抓鱼吧。"},
+{en:"I love watching the clouds change shapes.",zh:"我喜欢看云朵变换形状。"}]
+      }
+    ]
+  }
+};
+
+</script>
+<script>
+// ============================================================
+// English Islands App v4.0 — Munger Models + Dan Koe + SRS + Badges
+// ============================================================
+
+(function() {
+  'use strict';
+
+  // ---- Storage Keys ----
+  var OLD_KEY = 'english_islands_progress';
+  var STORAGE_KEY = 'english_islands_v3';
+  var STREAK_KEY = 'english_islands_streak_v3';
+  var DAILY_KEY = 'english_islands_daily_v3';
+  var JOURNAL_KEY = 'english_islands_journal_v3';
+  var STAR_KEY = 'english_islands_stars';
+  var SRS_KEY = 'english_islands_srs';
+  var BADGE_KEY = 'english_islands_badges';
+  var TIME_KEY = 'english_islands_time';
+
+  // ---- State ----
+  var state = {
+    user: null, islandIdx: null, playingIdx: null,
+    shadowMode: false, revealedSentences: {}, completedSentences: {},
+    streak: { count: 0, lastDate: null, history: [] },
+    daily: { date: null, sentences: 0 },
+    journal: [],
+    stars: 0,
+    favoriteSentences: [],
+    srs: [],          // [{uk, ii, si, dueDate, interval, reps}]
+    badges: [],       // [{id, date}]
+    showChinese: true, // toggle Chinese translation display
+    sessionStart: null
+  };
+
+  var utterance = null, synth = window.speechSynthesis;
+  var playAllQueue = [], playAllIndex = 0;
+
+  function isChild() { return state.user === 'mumu'; }
+  function getEn(s) { return (typeof s === 'object' && s !== null) ? (s.en || '') : s; }
+  function getZh(s) { return (typeof s === 'object' && s !== null) ? (s.zh || '') : ''; }
+
+  function todayStr() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function dateStr(d) {
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
+  function load(k) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch(e) { return null; } }
+
+  // ---- SRS (Spaced Repetition System) ----
+  var SRS_INTERVALS = [1, 3, 7, 14, 30]; // days
+
+  function getDueReviews(uk) {
+    var today = todayStr();
+    return state.srs.filter(function(r) {
+      return r.uk === uk && r.dueDate <= today;
+    });
+  }
+
+  function getAllDueReviews() {
+    var today = todayStr();
+    return state.srs.filter(function(r) { return r.dueDate <= today; });
+  }
+
+  function markReviewed(uk, ii, si) {
+    var key = uk + '-' + ii + '-' + si;
+    var existing = state.srs.filter(function(r) { return r.uk+'-'+r.ii+'-'+r.si === key; });
+    if (existing.length > 0) {
+      var item = existing[0];
+      var nextInterval = (item.reps + 1 >= SRS_INTERVALS.length) ? SRS_INTERVALS[SRS_INTERVALS.length - 1] : SRS_INTERVALS[item.reps + 1];
+      item.dueDate = addDays(new Date(), nextInterval);
+      item.interval = nextInterval;
+      item.reps = item.reps + 1;
+    } else {
+      var nextInterval = SRS_INTERVALS[0];
+      state.srs.push({
+        uk: uk, ii: ii, si: si,
+        dueDate: addDays(new Date(), nextInterval),
+        interval: nextInterval, reps: 0
+      });
+    }
+    save(SRS_KEY, state.srs);
+  }
+
+  function addDays(d, n) {
+    var r = new Date(d);
+    r.setDate(r.getDate() + n);
+    return dateStr(r);
+  }
+
+  function getSRSStats(uk) {
+    var all = state.srs.filter(function(r) { return r.uk === uk; });
+    var due = getDueReviews(uk).length;
+    var total = all.length;
+    var mastered = all.filter(function(r) { return r.reps >= SRS_INTERVALS.length; }).length;
+    return { total: total, due: due, mastered: mastered };
+  }
+
+  // ---- Achievement Badges ----
+  var BADGE_DEFS = [
+    { id: 'first', name: '初次启航', desc: '掌握第一句英语', icon: '\u2693' },
+    { id: 'streak3', name: '三日坚持', desc: '连续打卡3天', icon: '\ud83d\udd25' },
+    { id: 'streak7', name: '一周达人', desc: '连续打卡7天', icon: '\u2b50' },
+    { id: 'streak30', name: '月度冠军', desc: '连续打卡30天', icon: '\ud83c\udfc6' },
+    { id: 'ten', name: '十句通关', desc: '掌握10句', icon: '\ud83d\udcaf' },
+    { id: 'fifty', name: '五十句里程碑', desc: '掌握50句', icon: '\ud83c\udf1f' },
+    { id: 'hundred', name: '百句大师', desc: '掌握100句', icon: '\ud83d\udc51' },
+    { id: 'island1', name: '首岛征服', desc: '完成第一个岛', icon: '\ud83c\udf0d' },
+    { id: 'review10', name: '复习达人', desc: '完成10次复习', icon: '\ud83d\udd04' },
+    { id: 'journal1', name: '反思开始', desc: '写第一篇日记', icon: '\ud83d\udcdd' },
+    { id: 'journal7', name: '反思高手', desc: '写7篇日记', icon: '\ud83d\udcdc' }
+  ];
+
+  function checkBadges(uk) {
+    var p = getUserProgress(uk);
+    var earned = state.badges.map(function(b) { return b.id; });
+    var newBadges = [];
+    function tryEarn(id) {
+      if (earned.indexOf(id) === -1) {
+        state.badges.push({ id: id, date: todayStr() });
+        newBadges.push(id);
+        earned.push(id);
+      }
+    }
+    if (p.done >= 1) tryEarn('first');
+    if (p.done >= 10) tryEarn('ten');
+    if (p.done >= 50) tryEarn('fifty');
+    if (p.done >= 100) tryEarn('hundred');
+    if (state.streak.count >= 3) tryEarn('streak3');
+    if (state.streak.count >= 7) tryEarn('streak7');
+    if (state.streak.count >= 30) tryEarn('streak30');
+    // Check island completion
+    var u = APP_DATA[uk];
+    if (u) {
+      for (var i = 0; i < u.islands.length; i++) {
+        var ip = getIslandProgress(uk, i);
+        if (ip.done === ip.total && ip.total > 0) { tryEarn('island1'); break; }
+      }
+    }
+    var reviewCount = state.srs.filter(function(r) { return r.uk === uk && r.reps > 0; }).length;
+    if (reviewCount >= 10) tryEarn('review10');
+    var journalCount = state.journal.length;
+    if (journalCount >= 1) tryEarn('journal1');
+    if (journalCount >= 7) tryEarn('journal7');
+    if (newBadges.length > 0) save(BADGE_KEY, state.badges);
+    return newBadges;
+  }
+
+  // ---- Health Warning ----
+  function getHealthStatus() {
+    if (state.streak.history.length === 0) return { level: 'none', daysSince: 0 };
+    var last = state.streak.history[state.streak.history.length - 1];
+    var lastD = new Date(last);
+    var today = new Date();
+    today.setHours(0,0,0,0);
+    lastD.setHours(0,0,0,0);
+    var diff = Math.floor((today - lastD) / 86400000);
+    if (diff <= 1) return { level: 'good', daysSince: diff };
+    if (diff <= 3) return { level: 'yellow', daysSince: diff };
+    return { level: 'red', daysSince: diff };
+  }
+
+  // ---- Time Tracking ----
+  function trackTimeStart() {
+    state.sessionStart = Date.now();
+  }
+
+  function trackTimeEnd() {
+    if (!state.sessionStart) return;
+    var elapsed = Math.round((Date.now() - state.sessionStart) / 60000);
+    if (elapsed < 1) return;
+    var timeData = {};
+    try { timeData = JSON.parse(localStorage.getItem(TIME_KEY) || '{}'); } catch(e) {}
+    var today = todayStr();
+    if (!timeData[today]) timeData[today] = 0;
+    timeData[today] += elapsed;
+    try { localStorage.setItem(TIME_KEY, JSON.stringify(timeData)); } catch(e) {}
+    state.sessionStart = null;
+  }
+
+  function getTodayMinutes() {
+    var timeData = {};
+    try { timeData = JSON.parse(localStorage.getItem(TIME_KEY) || '{}'); } catch(e) {}
+    return timeData[todayStr()] || 0;
+  }
+
+  function getWeekMinutes() {
+    var timeData = {};
+    try { timeData = JSON.parse(localStorage.getItem(TIME_KEY) || '{}'); } catch(e) {}
+    var now = new Date(), dow = now.getDay() === 0 ? 6 : now.getDay() - 1;
+    var total = 0;
+    for (var i = 0; i < 7; i++) {
+      var d = new Date(now);
+      d.setDate(now.getDate() - dow + i);
+      total += timeData[dateStr(d)] || 0;
+    }
+    return total;
+  }
+
+  // ---- Core Data Functions ----
+  function loadAll() {
+    var _sc = load('ei_show_cn'); if (_sc !== null) state.showChinese = _sc;
+    try {
+      var old = localStorage.getItem(OLD_KEY);
+      if (old) {
+        var od = JSON.parse(old);
+        if (od.completed && !localStorage.getItem(STORAGE_KEY)) {
+          state.completedSentences = od.completed;
+          save(STORAGE_KEY, { completed: state.completedSentences });
+          localStorage.removeItem(OLD_KEY);
+        }
+      }
+    } catch(e) {}
+    try { var r = localStorage.getItem(STORAGE_KEY); if (r) { var d = JSON.parse(r); state.completedSentences = d.completed || {}; } } catch(e) {}
+    try { var r = localStorage.getItem(STREAK_KEY); if (r) { state.streak = JSON.parse(r); checkStreak(); } } catch(e) {}
+    try { var r = localStorage.getItem(DAILY_KEY); if (r) { var d = JSON.parse(r); if (d.date === todayStr()) state.daily = d; } } catch(e) {}
+    try { var r = localStorage.getItem(JOURNAL_KEY); if (r) state.journal = JSON.parse(r); } catch(e) {}
+    try { var r = localStorage.getItem(STAR_KEY); if (r) state.stars = JSON.parse(r); } catch(e) {}
+    try { var r = localStorage.getItem(SRS_KEY); if (r) state.srs = JSON.parse(r); } catch(e) {}
+    try { var r = localStorage.getItem(BADGE_KEY); if (r) state.badges = JSON.parse(r); } catch(e) {}
+  }
+
+  function checkStreak() {
+    var today = todayStr();
+    if (state.streak.lastDate === today) return;
+    var y = new Date(); y.setDate(y.getDate()-1);
+    var ys = y.getFullYear()+'-'+String(y.getMonth()+1).padStart(2,'0')+'-'+String(y.getDate()).padStart(2,'0');
+    if (state.streak.lastDate && state.streak.lastDate !== ys) state.streak.count = 0;
+  }
+
+  function recordActivity() {
+    var today = todayStr();
+    if (state.daily.date !== today) state.daily = { date: today, sentences: 0 };
+    state.daily.sentences++;
+    if (state.streak.lastDate !== today) {
+      var y = new Date(); y.setDate(y.getDate()-1);
+      var ys = y.getFullYear()+'-'+String(y.getMonth()+1).padStart(2,'0')+'-'+String(y.getDate()).padStart(2,'0');
+      state.streak.count = (state.streak.lastDate === ys) ? state.streak.count + 1 : 1;
+      state.streak.lastDate = today;
+      state.streak.history.push(today);
+      if (state.streak.history.length > 90) state.streak.history = state.streak.history.slice(-90);
+      save(STREAK_KEY, state.streak);
+      if (isChild()) { state.stars += 3; save(STAR_KEY, state.stars); }
+    }
+    save(DAILY_KEY, state.daily);
+    checkBadges(state.user);
+  }
+
+  function markCompleted(uk, ii, si) {
+    state.completedSentences[uk+'-'+ii+'-'+si] = true;
+    save(STORAGE_KEY, { completed: state.completedSentences });
+    recordActivity();
+  }
+
+  function isCompleted(uk, ii, si) { return !!state.completedSentences[uk+'-'+ii+'-'+si]; }
+
+  function getIslandProgress(uk, idx) {
+    var t = APP_DATA[uk].islands[idx].sentences.length, d = 0;
+    for (var i = 0; i < t; i++) if (isCompleted(uk,idx,i)) d++;
+    return { done: d, total: t, pct: t > 0 ? Math.round(d/t*100) : 0 };
+  }
+
+  function getUserProgress(uk) {
+    var u = APP_DATA[uk], t = 0, d = 0;
+    u.islands.forEach(function(isl, idx) { t += isl.sentences.length; for (var i = 0; i < isl.sentences.length; i++) if (isCompleted(uk,idx,i)) d++; });
+    return { done: d, total: t, pct: t > 0 ? Math.round(d/t*100) : 0 };
+  }
+
+  // ---- TTS ----
+  function stopSpeaking() { synth.cancel(); state.playingIdx = null; updatePlayingUI(); }
+  function speak(text, idx, onEnd) {
+    stopSpeaking();
+    var vc = APP_DATA[state.user].voice;
+    utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = vc.lang; utterance.pitch = vc.pitch; utterance.rate = vc.rate;
+    var voices = synth.getVoices(), pref = null, tgt = vc.name || '';
+    if (tgt) { for (var vi = 0; vi < voices.length; vi++) { if (voices[vi].name.indexOf(tgt)===0) { pref=voices[vi]; break; } } }
+    if (!pref) {
+      var ev = voices.filter(function(v){return v.lang&&v.lang.indexOf('en')===0&&v.localService;});
+      var safe = ['Samantha','Karen','Kathy','Daniel','Alex','Victoria','Moira','Junior'];
+      for (var si=0;si<safe.length;si++){for(var ei=0;ei<ev.length;ei++){if(ev[ei].name.indexOf(safe[si])===0){pref=ev[ei];break;}}if(pref)break;}
+    }
+    if (pref) utterance.voice = pref;
+    state.playingIdx = idx; updatePlayingUI();
+    utterance.onend = function(){ state.playingIdx=null; updatePlayingUI(); if(onEnd) onEnd(); };
+    utterance.onerror = function(){ state.playingIdx=null; updatePlayingUI(); };
+    synth.speak(utterance);
+  }
+
+  // ---- Nav ----
+  function reloadDynamicState() {
+    try { var r = localStorage.getItem(SRS_KEY); if (r) state.srs = JSON.parse(r); } catch(e) {}
+    try { var r = localStorage.getItem(BADGE_KEY); if (r) state.badges = JSON.parse(r); } catch(e) {}
+    try { var r = localStorage.getItem(TIME_KEY); } catch(e) {}
+    try { var r = localStorage.getItem(STAR_KEY); if (r) state.stars = JSON.parse(r); } catch(e) {}
+  }
+
+  function navigate(page, params) {
+    trackTimeEnd();
+    trackTimeStart();
+    reloadDynamicState();
+    var ps = document.querySelectorAll('.page'); for(var i=0;i<ps.length;i++) ps[i].classList.remove('active');
+    var el = document.getElementById('page-'+page);
+    if (el) { el.classList.add('active'); if(params) for(var k in params) state[k]=params[k]; renderPage(page); }
+    window.scrollTo(0,0);
+  }
+  function renderPage(p) {
+    if(p==='home') renderHome(); else if(p==='islands') renderIslands(); else if(p==='detail') renderDetail();
+    else if(p==='progress') renderProgress(); else if(p==='plan') renderPlan(); else if(p==='daily') renderDaily();
+    else if(p==='journal') renderJournal(); else if(p==='review') renderReview();
+  }
+  function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function handleRoute() {
+    var h = window.location.hash.slice(1);
+    if (h.indexOf('u/')===0) { var p=h.split('/'); if(p[1]&&APP_DATA[p[1]]) { state.user=p[1]; if(p.length>2&&p[2]!=='') { state.islandIdx=parseInt(p[2]); state.revealedSentences={}; navigate('detail'); return; } navigate('islands'); return; } }
+    if(h==='progress'){navigate('progress');return;} if(h==='plan'){navigate('plan');return;}
+    if(h==='daily'){navigate('daily');return;} if(h==='journal'){navigate('journal');return;}
+    if(h==='review'){navigate('review');return;}
+    navigate('home');
+  }
+
+  function weekData() {
+    var now=new Date(),dow=now.getDay()===0?6:now.getDay()-1,mon=new Date(now);mon.setDate(now.getDate()-dow);
+    var labels=['一','二','三','四','五','六','日'];
+    var active=[false,false,false,false,false,false,false],ad=0;
+    for(var i=0;i<7;i++){var d=new Date(mon);d.setDate(mon.getDate()+i);var ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');if(state.streak.history.indexOf(ds)!==-1){active[i]=true;ad++;}}
+    return {labels:labels,active:active,activeDays:ad};
+  }
+
+  // ---- HOME ----
+  function renderHome() {
+    var c = document.getElementById('page-home-content'); if (!c) return;
+    var wd = weekData(), sk = state.streak.count, ts = state.daily.sentences;
+    var health = getHealthStatus();
+    var srsStats; if (state.user) { srsStats = getSRSStats(state.user); } else {
+    var allSrs = state.srs; var today2 = todayStr();
+    srsStats = { total: allSrs.length, due: allSrs.filter(function(r){return r.dueDate<=today2;}).length, mastered: allSrs.filter(function(r){return r.reps>=SRS_INTERVALS.length;}).length };
+  }
+    var todayMin = getTodayMinutes();
+    var weekMin = getWeekMinutes();
+
+    var h = '<div class="max-w-lg mx-auto px-4 py-12">' +
+      '<div class="text-center mb-8">' +
+        '<h1 class="text-4xl font-extrabold text-gray-800 mb-2">English Islands</h1>' +
+        '<p class="text-gray-500 text-lg">' + (isChild() ? '让学英语像玩游戏一样有趣' : '芒格思维 + Dan Koe 方法 · 英语口语训练') + '</p>' +
+      '</div>';
+
+    // Health Warning Banner
+    if (health.level === 'yellow') {
+      h += '<div class="bg-amber-50 border border-amber-300 rounded-xl p-3 mb-4 text-center text-sm text-amber-700">\ud83d\udca1 已有 <strong>' + health.daysSince + '</strong> 天没练习了，现在开始还来得及！</div>';
+    } else if (health.level === 'red') {
+      h += '<div class="bg-red-50 border border-red-300 rounded-xl p-3 mb-4 text-center text-sm text-red-700">\u26a0\ufe0f 已有 <strong>' + health.daysSince + '</strong> 天没练习，<a href="#review" class="underline font-bold">先复习之前的内容</a>再继续吧。</div>';
+    }
+
+    // SRS Review Banner
+    if (srsStats.due > 0) {
+      h += '<div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-3 mb-4 text-center text-sm text-emerald-700 cursor-pointer hover:shadow-md transition" onclick="app.nav(\'review\')">\ud83d\udd04 <strong>' + srsStats.due + '</strong> 句待复习（间隔重复）→ 点击开始复习</div>';
+    }
+
+    // Badges Display
+    var earnedBadges = state.badges;
+    if (earnedBadges.length > 0) {
+      h += '<div class="bg-white rounded-xl border border-gray-100 p-4 mb-6"><div class="flex items-center gap-2 mb-2"><span class="text-sm font-bold text-gray-700">\ud83c\udf96\ufe0f 成就</span><span class="text-xs text-gray-400">' + earnedBadges.length + '/' + BADGE_DEFS.length + '</span></div><div class="flex flex-wrap gap-2">';
+      earnedBadges.forEach(function(b) {
+        var def = BADGE_DEFS.filter(function(d) { return d.id === b.id; })[0];
+        if (def) h += '<div class="px-2 py-1 bg-gray-50 rounded-lg text-xs text-gray-600" title="' + esc(def.name) + ': ' + esc(def.desc) + '">' + def.icon + ' ' + esc(def.name) + '</div>';
+      });
+      h += '</div></div>';
+    }
+
+    if (isChild()) {
+      h += '<div class="bg-gradient-to-r from-amber-400 to-orange-500 rounded-2xl p-5 mb-6 text-white">' +
+        '<div class="flex items-center justify-between">' +
+          '<div class="text-center"><div class="text-3xl mb-1">\u2b50</div><p class="text-3xl font-extrabold">' + state.stars + '</p><p class="text-white/70 text-sm">星星</p></div>' +
+          '<div class="text-center"><div class="text-3xl mb-1">\ud83d\udd25</div><p class="text-3xl font-extrabold">' + sk + '</p><p class="text-white/70 text-sm">连续天数</p></div>' +
+          '<div class="text-center"><div class="text-3xl mb-1">\ud83c\udfaf</div><p class="text-3xl font-extrabold">' + ts + '</p><p class="text-white/70 text-sm">今日</p></div>' +
+        '</div>' +
+        '<div class="flex gap-1 mt-3 justify-center">' +
+          wd.labels.map(function(l,i){return '<div class="flex flex-col items-center gap-0.5"><div class="w-6 h-6 rounded-full '+(wd.active[i]?'bg-white':'bg-white/30')+' flex items-center justify-center text-xs">'+(wd.active[i]?'\u2b50':'')+'</div><span class="text-[10px] text-white/50">'+l+'</span></div>';}).join('') +
+        '</div></div>';
+    } else {
+      h += '<div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-5 mb-6 text-white">' +
+        '<div class="flex items-center justify-between">' +
+          '<div><p class="text-white/70 text-sm">连续打卡</p><p class="text-3xl font-extrabold mt-1">' + sk + ' <span class="text-lg font-normal">天</span></p></div>' +
+          '<div class="text-center"><p class="text-white/70 text-sm">今日已练</p><p class="text-3xl font-extrabold">' + ts + ' <span class="text-lg font-normal">句</span></p></div>' +
+          '<div class="text-right"><p class="text-white/70 text-sm">本周活跃</p><p class="text-3xl font-extrabold">' + wd.activeDays + ' <span class="text-lg font-normal">天</span></p></div>' +
+        '</div>' +
+        '<div class="flex gap-1 mt-3 justify-center">' +
+          wd.labels.map(function(l,i){return '<div class="flex flex-col items-center gap-0.5"><div class="w-5 h-5 rounded-full '+(wd.active[i]?'bg-white':'bg-white/30')+' flex items-center justify-center text-[10px]">'+(wd.active[i]?'\u2713':'')+'</div><span class="text-[10px] text-white/50">'+l+'</span></div>';}).join('') +
+        '</div>' +
+        '<div class="flex items-center justify-between mt-3 pt-3 border-t border-white/20">' +
+          '<div><p class="text-white/70 text-xs">今日投入</p><p class="text-lg font-bold">' + todayMin + ' <span class="text-xs font-normal">分钟</span></p></div>' +
+          '<div><p class="text-white/70 text-xs">本周投入</p><p class="text-lg font-bold">' + weekMin + ' <span class="text-xs font-normal">分钟</span></p></div>' +
+          '<div><p class="text-white/70 text-xs">待复习</p><p class="text-lg font-bold">' + srsStats.due + ' <span class="text-xs font-normal">句</span></p></div>' +
+        '</div></div>';
+    }
+
+    // Quick Actions (4 grid)
+    h += '<div class="grid grid-cols-4 gap-3 mb-6">' +
+      '<div onclick="app.nav(\'daily\')" class="bg-white rounded-xl p-3 border border-gray-100 shadow-sm text-center cursor-pointer hover:shadow-md transition"><div class="text-2xl mb-1">' + (isChild()?'\ud83c\udfae':'\u23f0') + '</div><p class="text-[10px] font-medium text-gray-600">' + (isChild()?'今日任务':'每日训练') + '</p></div>' +
+      '<div onclick="app.nav(\'review\')" class="bg-white rounded-xl p-3 border border-gray-100 shadow-sm text-center cursor-pointer hover:shadow-md transition"><div class="text-2xl mb-1">\ud83d\udd04</div><p class="text-[10px] font-medium text-gray-600">间隔复习</p></div>' +
+      '<div onclick="app.nav(\'plan\')" class="bg-white rounded-xl p-3 border border-gray-100 shadow-sm text-center cursor-pointer hover:shadow-md transition"><div class="text-2xl mb-1">' + (isChild()?'\ud83d\uddfc\ufe0f':'\ud83d\udccd') + '</div><p class="text-[10px] font-medium text-gray-600">' + (isChild()?'冒险地图':'学习路线图') + '</p></div>' +
+      '<div onclick="app.nav(\'journal\')" class="bg-white rounded-xl p-3 border border-gray-100 shadow-sm text-center cursor-pointer hover:shadow-md transition"><div class="text-2xl mb-1">' + (isChild()?'\ud83c\udf1f':'\ud83d\udcdd') + '</div><p class="text-[10px] font-medium text-gray-600">' + (isChild()?'今天最棒的':'反思日记') + '</p></div>' +
+    '</div>';
+
+    // Guide
+    h += '<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">' +
+      '<div onclick="app.toggleGuide()" class="flex items-center justify-between cursor-pointer select-none">' +
+        '<h2 class="text-base font-bold text-gray-700">' + (isChild()?'玩法说明':'学习方法（芒格思维 + Dan Koe 五步法）') + '</h2>' +
+        '<svg id="guide-arrow" class="w-5 h-5 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>' +
+      '</div>';
+
+    if (isChild()) {
+      h += '<div id="guide-content" class="hidden mt-4 text-sm text-gray-600 space-y-3 leading-relaxed">' +
+        '<div class="flex gap-3"><span class="text-amber-500 font-bold text-base shrink-0">1</span><div><strong class="text-gray-700">选择冒险</strong><br>每个岛是一个地图，选一个开始吧！</div></div>' +
+        '<div class="flex gap-3"><span class="text-amber-500 font-bold text-base shrink-0">2</span><div><strong class="text-gray-700">听和跟读</strong><br>点播放按钮听发音，大声跟着说！说错也没关系。</div></div>' +
+        '<div class="flex gap-3"><span class="text-amber-500 font-bold text-base shrink-0">3</span><div><strong class="text-gray-700">赢得星星</strong><br>掌握一句就能得星星，每天打卡额外奖励 3 颗⭐！</div></div>' +
+        '<div class="flex gap-3"><span class="text-amber-500 font-bold text-base shrink-0">4</span><div><strong class="text-gray-700">挑战赛</strong><br>开启影子模式，先听再猜，看你猜对多少！</div></div>' +
+        '<div class="mt-4 p-3 bg-amber-50 rounded-xl text-amber-700 text-xs leading-relaxed"><strong>小贴士：</strong>每天玩 15 分钟就够了！学不会没关系，反复听就行！</div>' +
+      '</div>';
+    } else {
+      h += '<div id="guide-content" class="hidden mt-4 text-sm text-gray-600 space-y-3 leading-relaxed">' +
+        '<div class="flex gap-3"><span class="text-indigo-500 font-bold shrink-0">\u2460</span><div><strong>知识地图（能力圈）</strong><br>8 个语言岛是你的学习路线图，先建立整体认知，再逐个攻克。</div></div>' +
+        '<div class="flex gap-3"><span class="text-indigo-500 font-bold shrink-0">\u2461</span><div><strong>项目驱动（机会成本）</strong><br>每天投入的时间都是有成本的，确保用在最高回报的活动上。每句练习都记入时间投入。</div></div>' +
+        '<div class="flex gap-3"><span class="text-indigo-500 font-bold shrink-0">\u2462</span><div><strong>间隔重复（安全边际）</strong><br>芒格说"始终留有余地"。学过的句子会按 1→3→7→14→30 天间隔自动提醒复习，确保记忆不遗忘。</div></div>' +
+        '<div class="flex gap-3"><span class="text-indigo-500 font-bold shrink-0">\u2463</span><div><strong>场景挑战（二阶思维）</strong><br>不只是记住句子，更要学会替换关键词创造新句子。"学句型，不学死句子"。</div></div>' +
+        '<div class="flex gap-3"><span class="text-indigo-500 font-bold shrink-0">\u2464</span><div><strong>反思输出（费曼技巧 + 逆向思维）</strong><br>用自己的话教会别人，是检验理解的最佳方式。写日记时思考"哪里可能出错"。</div></div>' +
+        '<div class="mt-4 p-3 bg-indigo-50 rounded-xl text-indigo-700 text-xs leading-relaxed"><strong>\ud83d\udca1 芒格提示：</strong>"在生活中学到的最重要教训是： постоянно思考反向—— 不要 只想如何成功，而是想如何避免失败。"</div>' +
+      '</div>';
+    }
+
+    // Learner Selection Cards
+    h += '<div class="grid grid-cols-2 gap-3 mt-6">' +
+      '<div onclick="app.selectUser(\'yanghua\')" class="learner-card bg-gradient-to-br from-pink-50 to-rose-100 rounded-2xl p-5 border border-pink-200 text-center cursor-pointer hover:shadow-lg transition">' +
+        '<div class="text-3xl mb-2">👩‍🏫</div><div class="font-bold text-gray-800">成人版</div><div class="text-xs text-gray-500 mt-1">Dan Koe 方法 + 芒格思维</div><div class="text-xs text-pink-500 mt-2">8 岛 · 153 句</div>' +
+      '</div>' +
+      '<div onclick="app.selectUser(\'mumu\')" class="learner-card bg-gradient-to-br from-amber-50 to-orange-100 rounded-2xl p-5 border border-amber-200 text-center cursor-pointer hover:shadow-lg transition">' +
+        '<div class="text-3xl mb-2">👦</div><div class="font-bold text-gray-800">儿童版</div><div class="text-xs text-gray-500 mt-1">游戏化学习</div><div class="text-xs text-amber-500 mt-2">8 岛 · 148 句</div>' +
+      '</div></div>';
+
+    h += '</div>';
+    c.innerHTML = h;
+  }
+
+  // ---- ISLANDS ----
+  function renderIslands() {
+    var c = document.getElementById('page-islands-content'); if (!c) return;
+    if (!state.user) { c.innerHTML = '<div class="max-w-lg mx-auto px-4 py-12 text-center"><p class="text-gray-400">请先选择学习者</p><button onclick="app.nav(\'home\')" class="mt-4 px-4 py-2 bg-indigo-500 text-white rounded-lg">返回首页</button></div>'; return; }
+    var u = APP_DATA[state.user], p = getUserProgress(state.user);
+
+    var h = '<div class="max-w-2xl mx-auto px-4 py-8">' +
+      '<a href="#" onclick="app.nav(\'home\');return false;" class="flex items-center gap-1 text-gray-400 hover:text-gray-600 text-sm mb-6 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>返回</a>';
+
+    if (isChild()) {
+      h += '<h1 class="text-2xl font-bold text-gray-800 mb-2">\ud83c\udf0d 冒险地图</h1>' +
+        '<p class="text-gray-500 text-sm mb-6">选择一个岛屿开始冒险！每掌握一句得 1 \u2b50</p>';
+    } else {
+      h += '<h1 class="text-2xl font-bold text-gray-800 mb-2">\ud83c\udf0d 语言岛</h1>' +
+        '<p class="text-gray-500 text-sm mb-6">总进度：' + p.done + '/' + p.total + '（' + p.pct + '%）</p>';
+    }
+
+    h += '<div class="space-y-3">';
+    u.islands.forEach(function(isl, idx) {
+      var ip = getIslandProgress(state.user, idx);
+      var unlocked = idx === 0 || getIslandProgress(state.user, idx - 1).pct >= 50;
+      h += '<div onclick="' + (unlocked ? 'app.selectIsland(' + idx + ')' : '') + '" class="' + (unlocked ? 'cursor-pointer hover:shadow-lg' : 'opacity-50 cursor-not-allowed') + ' bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-4 transition">' +
+        '<div class="w-12 h-12 rounded-xl ' + (unlocked ? (isChild() ? 'bg-amber-100' : 'bg-indigo-100') : 'bg-gray-100') + ' flex items-center justify-center text-2xl shrink-0">' + isl.icon + '</div>' +
+        '<div class="flex-1 min-w-0">' +
+          '<div class="font-bold text-gray-800 text-sm">' + (idx + 1) + '. ' + esc(isl.name) + '</div>' +
+          '<div class="text-xs text-gray-400">' + esc(isl.desc) + '</div>' +
+          '<div class="mt-2 w-full bg-gray-100 rounded-full h-2"><div class="h-2 rounded-full ' + (ip.pct >= 100 ? 'bg-green-400' : (isChild() ? 'bg-amber-400' : 'bg-indigo-400')) + '" style="width:' + ip.pct + '%"></div></div>' +
+        '</div>' +
+        '<div class="text-right shrink-0"><span class="text-sm font-bold ' + (isChild() ? 'text-amber-600' : 'text-indigo-600') + '">' + ip.pct + '%</span><br><span class="text-xs text-gray-400">' + ip.done + '/' + ip.total + '</span></div>' +
+      '</div>';
+    });
+    h += '</div>';
+
+    if (!isChild()) {
+      h += '<div class="mt-4 text-center"><label class="text-xs text-gray-400 inline-flex items-center gap-1"><input type="checkbox" class="w-3 h-3" ' + (state.shadowMode ? 'checked' : '') + ' onchange="app.toggleShadow()"> 影子跟读模式</label></div>';
+    }
+
+    h += '</div>';
+    c.innerHTML = h;
+  }
+
+  // ---- DETAIL ----
+  function renderDetail() {
+    var c = document.getElementById('page-detail-content'); if (!c) return;
+    if (!state.user) { c.innerHTML = '<div class="max-w-lg mx-auto px-4 py-12 text-center"><p class="text-gray-400">请先选择学习者</p><button onclick="app.nav(\'home\')" class="mt-4 px-4 py-2 bg-indigo-500 text-white rounded-lg">返回首页</button></div>'; return; }
+    var isl = APP_DATA[state.user].islands[state.islandIdx];
+    var ip = getIslandProgress(state.user, state.islandIdx);
+    var uk = state.user, ii = state.islandIdx;
+
+    var h = '<div class="max-w-2xl mx-auto px-4 py-8">' +
+      '<a href="#" onclick="app.nav(\'islands\');return false;" class="flex items-center gap-1 text-gray-400 hover:text-gray-600 text-sm mb-6 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>返回</a>';
+
+    h += '<div class="flex items-center gap-3 mb-4"><div class="w-12 h-12 rounded-xl ' + (isChild() ? 'bg-amber-100' : 'bg-indigo-100') + ' flex items-center justify-center text-2xl">' + isl.icon + '</div><div><h1 class="text-xl font-bold text-gray-800">' + esc(isl.name) + '</h1><p class="text-sm text-gray-400">' + esc(isl.desc) + '</p></div></div>' +
+      '<div class="bg-gray-50 rounded-lg p-3 mb-4 text-sm"><span class="text-gray-500">进度：</span><strong>' + ip.done + '/' + ip.total + '（' + ip.pct + '%）</strong></div>';
+
+    if (isChild()) {
+      if (state.shadowMode) {
+        h += '<div class="bg-orange-50 border border-orange-200 rounded-xl p-3 mb-4 text-center text-sm text-orange-700">\ud83c\udfae 影子模式已开启 — 先听再猜，看看你能不能猜对！</div>';
+      }
+    } else {
+      // Adult: Munger tips
+      h += '<div class="bg-purple-50 border border-purple-200 rounded-xl p-3 mb-4 text-sm text-purple-700">\ud83d\udca1 <strong>芒格提示：</strong>想想能怎么替换关键词 — 学句型，不学死句子。每个句子都是模板。</div>';
+      if (state.shadowMode) {
+        h += '<div class="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-4 text-center text-sm text-blue-700">\ud83c\udfae 影子模式 — 先听再猜，训练反应速度</div>';
+      }
+      // SRS info for this island
+      var islandReviews = state.srs.filter(function(r) { return r.uk === uk && r.ii === ii && r.dueDate <= todayStr(); });
+      if (islandReviews.length > 0) {
+        h += '<div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-4 text-sm text-emerald-700 cursor-pointer hover:shadow-md transition" onclick="app.nav(\'review\')">\ud83d\udd04 本岛有 <strong>' + islandReviews.length + '</strong> 句待复习（间隔重复）</div>';
+      }
+    }
+
+    // Play All
+    h += '<button onclick="app.playAll()" id="play-all-btn" class="w-full mb-4 py-2.5 rounded-lg ' + (isChild() ? 'bg-amber-500 hover:bg-amber-600' : 'bg-indigo-500 hover:bg-indigo-600') + ' text-white font-medium text-sm transition"><span id="play-all-text">\u25b6 播放全部（' + isl.sentences.length + ' 句）</span></button>';
+
+    // Chinese toggle
+    h += '<button onclick="app.toggleChinese()" class="w-full mb-2 py-2 rounded-lg border border-gray-200 bg-gray-50 text-gray-600 text-sm transition hover:bg-gray-100">' + (state.showChinese ? '\ud83d\udc64 \u9690\u85cf\u4e2d\u6587\u7ffb\u8bd1' : '\ud83c\udf10 \u663e\u793a\u4e2d\u6587\u7ffb\u8bd1') + '</button>';
+
+    // Sentence list
+    h += '<div class="space-y-2">';
+    isl.sentences.forEach(function(s, idx) {
+      var done = isCompleted(uk, ii, idx);
+      var revealed = state.revealedSentences[idx] || !state.shadowMode;
+      var srsItem = state.srs.filter(function(r) { return r.uk===uk && r.ii===ii && r.si===idx; })[0];
+
+      h += '<div class="sentence-item bg-white rounded-xl border ' + (done ? 'border-green-200 bg-green-50/50' : 'border-gray-100') + ' p-4 flex items-start gap-3 transition" data-idx="' + idx + '">' +
+        '<button onclick="app.playSentence(' + idx + ')" class="play-btn w-8 h-8 rounded-full ' + (isChild() ? 'bg-amber-100 hover:bg-amber-200' : 'bg-indigo-100 hover:bg-indigo-200') + ' flex items-center justify-center shrink-0 mt-0.5 transition"><svg class="w-4 h-4 ' + (isChild() ? 'text-amber-500' : 'text-indigo-500') + '" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>' +
+        '<div class="flex-1 min-w-0">' +
+          (revealed ? '<p class="text-sm text-gray-800">' + esc(getEn(s)) + (state.showChinese && getZh(s) ? '<span class="text-gray-400 ml-2">- ' + esc(getZh(s)) + '</span>' : '') + '</p>' : '<p class="text-sm text-gray-400 italic">\u70b9\u64ad\u653e\u542c\u53d1\u97f3\uff0c\u731c\u731c\u662f\u4ec0\u4e48\uff1f</p>') +
+          (srsItem ? '<p class="text-[10px] text-emerald-500 mt-1">\ud83d\udd04 \u590d\u4e60 ' + srsItem.reps + ' \u6b21 · \u4e0b\u6b21: ' + srsItem.dueDate + '</p>' : '') +
+        '</div>' +
+        '<div class="shrink-0 flex items-center gap-2">';
+
+      if (state.shadowMode && !revealed) {
+        h += '<button onclick="app.revealSentence(' + idx + ')" class="text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-600 transition">\u63ed\u6653</button>';
+      }
+      if (done) {
+        h += '<span class="text-green-500 text-sm">' + (isChild() ? '\u2b50' : '\u2713') + '</span>';
+      } else {
+        h += '<button onclick="app.markDone(' + idx + ')" class="text-xs px-2 py-1 rounded ' + (isChild() ? 'bg-amber-100 hover:bg-amber-200 text-amber-700' : 'bg-indigo-100 hover:bg-indigo-200 text-indigo-700') + ' transition">' + (isChild() ? '\u638c\u63e1\u5b83\u2b50' : '\u638c\u63e1') + '</button>';
+      }
+
+      h += '</div></div>';
+    });
+    h += '</div></div>';
+    c.innerHTML = h;
+  }
+
+  // ---- PROGRESS ----
+  function renderProgress() {
+    var c = document.getElementById('page-progress-content'); if (!c) return;
+    if (!state.user) { c.innerHTML = '<div class="max-w-lg mx-auto px-4 py-12 text-center"><p class="text-gray-400">请先选择学习者</p><button onclick="app.nav(\'home\')" class="mt-4 px-4 py-2 bg-indigo-500 text-white rounded-lg">返回首页</button></div>'; return; }
+    var p = getUserProgress(state.user);
+    var srs = getSRSStats(state.user);
+    var wd = weekData();
+    var health = getHealthStatus();
+    var timeData = {};
+    try { timeData = JSON.parse(localStorage.getItem(TIME_KEY) || '{}'); } catch(e) {}
+
+    var h = '<div class="max-w-2xl mx-auto px-4 py-8">' +
+      '<a href="#" onclick="app.nav(\'home\');return false;" class="flex items-center gap-1 text-gray-400 hover:text-gray-600 text-sm mb-6 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>返回</a>' +
+      '<h1 class="text-2xl font-bold text-gray-800 mb-6">\ud83d\udcca 进度看板</h1>';
+
+    // Summary Cards
+    h += '<div class="grid grid-cols-3 gap-3 mb-6">' +
+      '<div class="bg-white rounded-xl border border-gray-100 p-4 text-center"><p class="text-3xl font-extrabold ' + (isChild() ? 'text-amber-500' : 'text-indigo-600') + '">' + (isChild() ? '\u2b50' + state.stars : p.done) + '</p><p class="text-xs text-gray-400 mt-1">' + (isChild() ? '总星星' : '已掌握') + '</p></div>' +
+      '<div class="bg-white rounded-xl border border-gray-100 p-4 text-center"><p class="text-3xl font-extrabold text-emerald-600">' + srs.mastered + '</p><p class="text-xs text-gray-400 mt-1">已巩固</p></div>' +
+      '<div class="bg-white rounded-xl border border-gray-100 p-4 text-center"><p class="text-3xl font-extrabold text-blue-600">' + state.streak.count + '</p><p class="text-xs text-gray-400 mt-1">连续打卡</p></div>' +
+    '</div>';
+
+    // Health Status
+    h += '<div class="bg-white rounded-xl border border-gray-100 p-4 mb-6"><div class="flex items-center gap-2 mb-2"><span class="font-bold text-gray-700 text-sm">\u2764\ufe0f 健康状态</span></div>';
+    if (health.level === 'good') h += '<p class="text-green-600 text-sm">\u2705 状态良好，继续保持！</p>';
+    else if (health.level === 'yellow') h += '<p class="text-amber-600 text-sm">\u26a0\ufe0f ' + health.daysSince + ' 天未练习，注意保持节奏</p>';
+    else h += '<p class="text-red-600 text-sm">\ud83d\udea8 ' + health.daysSince + ' 天未练习，建议先复习</p>';
+    h += '</div>';
+
+    // SRS Stats
+    if (srs.total > 0) {
+      h += '<div class="bg-white rounded-xl border border-gray-100 p-4 mb-6"><div class="flex items-center gap-2 mb-2"><span class="font-bold text-gray-700 text-sm">\ud83d\udd04 间隔重复</span></div>' +
+        '<div class="grid grid-cols-3 gap-2 text-center"><div><p class="text-lg font-bold text-gray-800">' + srs.total + '</p><p class="text-xs text-gray-400">进入SRS</p></div>' +
+        '<div><p class="text-lg font-bold text-emerald-600">' + srs.mastered + '</p><p class="text-xs text-gray-400">已巩固</p></div>' +
+        '<div><p class="text-lg font-bold text-amber-600">' + srs.due + '</p><p class="text-xs text-gray-400">待复习</p></div></div></div>';
+    }
+
+    // Badges
+    h += '<div class="bg-white rounded-xl border border-gray-100 p-4 mb-6"><div class="flex items-center justify-between mb-3"><span class="font-bold text-gray-700 text-sm">\ud83c\udf96\ufe0f 成就徽章</span><span class="text-xs text-gray-400">' + state.badges.length + '/' + BADGE_DEFS.length + '</span></div><div class="grid grid-cols-4 gap-2">';
+    BADGE_DEFS.forEach(function(def) {
+      var earned = state.badges.filter(function(b) { return b.id === def.id; }).length > 0;
+      h += '<div class="p-2 rounded-lg text-center ' + (earned ? 'bg-indigo-50 border border-indigo-200' : 'bg-gray-50 border border-gray-100 opacity-40') + '" title="' + esc(def.name) + ': ' + esc(def.desc) + '">' +
+        '<div class="text-xl mb-1">' + def.icon + '</div>' +
+        '<p class="text-[10px] text-gray-600">' + esc(def.name) + '</p></div>';
+    });
+    h += '</div></div>';
+
+    // Time Investment (adult only)
+    if (!isChild()) {
+      var weekMin = getWeekMinutes();
+      var todayMin = getTodayMinutes();
+      h += '<div class="bg-white rounded-xl border border-gray-100 p-4 mb-6"><div class="flex items-center gap-2 mb-2"><span class="font-bold text-gray-700 text-sm">\u23f1\ufe0f 时间投入（芒格：机会成本）</span></div>' +
+        '<div class="grid grid-cols-2 gap-2 text-center"><div><p class="text-lg font-bold text-gray-800">' + todayMin + '</p><p class="text-xs text-gray-400">今日（分钟）</p></div>' +
+        '<div><p class="text-lg font-bold text-gray-800">' + weekMin + '</p><p class="text-xs text-gray-400">本周（分钟）</p></div></div>' +
+        '<p class="text-xs text-gray-400 mt-2 text-center">\ud83d\udca1 每天投入 30 分钟，一年累计 182 小时 — 你的机会成本是否值得？</p></div>';
+    }
+
+    // Calendar
+    h += '<div class="bg-white rounded-xl border border-gray-100 p-4 mb-6"><div class="font-bold text-gray-700 text-sm mb-3">\ud83d\udcc5 本周打卡日历</div>' +
+      '<div class="flex gap-1 justify-center">' +
+        wd.labels.map(function(l,i){return '<div class="flex flex-col items-center gap-0.5"><div class="w-8 h-8 rounded-full '+(wd.active[i]?'bg-indigo-500 text-white':'bg-gray-100 text-gray-400')+' flex items-center justify-center text-sm font-bold">'+(wd.active[i]?'\u2713':'')+'</div><span class="text-xs text-gray-400 mt-1">'+l+'</span></div>';}).join('') +
+      '</div></div>';
+
+    // Per-Island
+    h += '<div class="bg-white rounded-xl border border-gray-100 p-4 mb-6"><div class="font-bold text-gray-700 text-sm mb-3">\ud83c\udf0d 各岛进度</div><div class="space-y-2">';
+    APP_DATA[state.user].islands.forEach(function(isl, idx) {
+      var ip = getIslandProgress(state.user, idx);
+      h += '<div class="flex items-center gap-3"><span class="text-lg">' + isl.icon + '</span><span class="flex-1 text-sm text-gray-700">' + esc(isl.name) + '</span><div class="flex-1"><div class="w-full bg-gray-100 rounded-full h-2"><div class="h-2 rounded-full ' + (ip.pct>=100?'bg-green-400':(isChild()?'bg-amber-400':'bg-indigo-400')) + '" style="width:'+ip.pct+'%"></div></div></div><span class="text-xs text-gray-500 w-12 text-right">'+ip.pct+'%</span></div>';
+    });
+    h += '</div></div>';
+
+    // Reset
+    h += '<div class="text-center"><button onclick="app.resetProgress()" class="text-xs text-gray-400 hover:text-red-400 transition">\u91cd\u7f6e\u6240\u6709\u8fdb\u5ea6</button></div>';
+
+    h += '</div>';
+    c.innerHTML = h;
+  }
+
+  // ---- PLAN (Learning Roadmap) ----
+  function renderPlan() {
+    var c = document.getElementById('page-plan-content'); if (!c) return;
+    if (!state.user) { c.innerHTML = '<div class="max-w-lg mx-auto px-4 py-12 text-center"><p class="text-gray-400">请先选择学习者</p><button onclick="app.nav(\'home\')" class="mt-4 px-4 py-2 bg-indigo-500 text-white rounded-lg">返回首页</button></div>'; return; }
+    var p = getUserProgress(state.user);
+
+    var h = '<div class="max-w-2xl mx-auto px-4 py-8">' +
+      '<a href="#" onclick="app.nav(\'home\');return false;" class="flex items-center gap-1 text-gray-400 hover:text-gray-600 text-sm mb-6 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>返回</a>';
+
+    if (isChild()) {
+      h += '<h1 class="text-2xl font-bold text-gray-800 mb-2">\ud83d\uddfc\ufe0f 冒险地图</h1>' +
+        '<p class="text-gray-500 text-sm mb-6">完成一个岛，解锁下一个岛！</p>' +
+        '<div class="space-y-4">';
+      APP_DATA[state.user].islands.forEach(function(isl, idx) {
+        var ip = getIslandProgress(state.user, idx);
+        var unlocked = idx === 0 || getIslandProgress(state.user, idx - 1).pct >= 50;
+        h += '<div class="flex items-start gap-4">' +
+          '<div class="w-10 h-10 rounded-full ' + (ip.pct>=100?'bg-green-400':(unlocked?'bg-amber-400':'bg-gray-200')) + ' flex items-center justify-center text-white font-bold shrink-0">' + (idx+1) + '</div>' +
+          '<div class="flex-1"><h3 class="font-bold text-gray-800 text-sm">' + isl.icon + ' ' + esc(isl.name) + '</h3><p class="text-xs text-gray-400">' + esc(isl.desc) + '</p>' +
+            '<div class="mt-2 w-full bg-gray-100 rounded-full h-2"><div class="h-2 rounded-full ' + (ip.pct>=100?'bg-green-400':'bg-amber-400') + '" style="width:'+ip.pct+'%"></div></div>' +
+            (unlocked ? '<p class="text-xs text-amber-600 mt-1">' + (ip.pct>=100?'已完成！':'解锁中...') + '</p>' : '<p class="text-xs text-gray-400 mt-1">完成上一岛50%解锁</p>') +
+          '</div></div>';
+      });
+      h += '</div>';
+    } else {
+      h += '<h1 class="text-2xl font-bold text-gray-800 mb-2">\ud83d\udccd 学习路线图</h1>' +
+        '<p class="text-gray-500 text-sm mb-6">当前进度：' + p.done + '/' + p.total + '（' + p.pct + '%）</p>';
+
+      // Munger wisdom banner
+      h += '<div class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-4 mb-6 text-sm"><strong class="text-purple-800">\ud83e\uddd8 芒格思维：</strong><span class="text-purple-700">"能力圈" — 不要试图一次攻克所有岛屿。先在一个领域做到足够好，再扩展到相邻领域。集中精力 = 安全边际。</span></div>';
+
+      h += '<div class="space-y-4">';
+      var weeks = [
+        { title: '第1周 · 能力圈建立', desc: '专注 Daily Life 岛，掌握基础句型框架', focus: '深度练习 30分钟/天', munger: '逆向思维：如果一周后完全忘记，你今天会怎么学？' },
+        { title: '第2周 · 深度沉浸', desc: 'Daily Life 达 80% + 开始 Work Office', focus: '间隔重复复习第1周内容', munger: '安全边际：每天复习旧句 > 学新句。遗忘曲线是敌人。' },
+        { title: '第3周 · 场景扩展', desc: 'Work Office 达 80% + 开始 Travel', focus: '影子跟读训练反应速度', munger: 'Lollapalooza 效应：听+跟读+复习 多种方法叠加效果 > 单一方法' },
+        { title: '第4周 · 句型变体', desc: 'Travel 达 80% + 开始表达练习', focus: '替换关键词，创造新句子', munger: '二阶思维：学一个句型 → 能衍生 10 个句子 → 实际能力指数增长' },
+        { title: '第5周 · 费曼输出', desc: '开始教别人（日记/口语）', focus: '每天用英语教家人一句', munger: '激励偏差：教别人的成就感是最好的学习动力' },
+        { title: '第6周 · 系统巩固', desc: '全部岛屿复习 + 间隔重复冲刺', focus: '所有到期句子复习完毕', munger: '机会成本：这段时间的投入换来的英语能力，是否值得你放弃的其他选择？' }
+      ];
+
+      weeks.forEach(function(w, i) {
+        var isActive = (p.pct >= i * 15 && p.pct < (i + 1) * 15 + 10);
+        h += '<div class="bg-white rounded-xl border ' + (isActive ? 'border-indigo-200 shadow-md' : 'border-gray-100') + ' p-4">' +
+          '<div class="flex items-start gap-3"><div class="w-8 h-8 rounded-full ' + (isActive ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-500') + ' flex items-center justify-center font-bold text-sm shrink-0">' + (i+1) + '</div>' +
+          '<div class="flex-1"><h3 class="font-bold text-gray-800 text-sm">' + esc(w.title) + '</h3><p class="text-xs text-gray-500 mt-1">' + esc(w.desc) + '</p><p class="text-xs text-indigo-600 mt-1">\ud83c\udfae ' + esc(w.focus) + '</p>' +
+          '<p class="text-xs text-purple-600 mt-1 italic">\ud83e\uddd8 ' + esc(w.munger) + '</p></div></div></div>';
+      });
+      h += '</div>';
+    }
+    h += '</div>';
+    c.innerHTML = h;
+  }
+
+  // ---- DAILY ----
+  function renderDaily() {
+    var c = document.getElementById('page-daily-content'); if (!c) return;
+    if (!state.user) { c.innerHTML = '<div class="max-w-lg mx-auto px-4 py-12 text-center"><p class="text-gray-400">请先选择学习者</p><button onclick="app.nav(\'home\')" class="mt-4 px-4 py-2 bg-indigo-500 text-white rounded-lg">返回首页</button></div>'; return; }
+    var child = isChild();
+    var srsDue = getAllDueReviews().slice(0, 5);
+
+    if (child) {
+      var h = '<div class="max-w-2xl mx-auto px-4 py-8">' +
+        '<a href="#" onclick="app.nav(\'home\');return false;" class="flex items-center gap-1 text-gray-400 hover:text-gray-600 text-sm mb-6 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>返回</a>' +
+        '<h1 class="text-2xl font-bold text-gray-800 mb-2">\ud83c\udfae 今日任务</h1>' +
+        '<p class="text-gray-500 text-sm mb-6">每天玩 15 分钟就够了！</p>';
+
+      // Review reminder
+      if (srsDue.length > 0) {
+        h += '<div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-4 text-sm text-emerald-700 cursor-pointer hover:shadow-md transition" onclick="app.nav(\'review\')">\ud83d\udd04 有 <strong>' + srsDue.length + '</strong> 句待复习，先复习一下？</div>';
+      }
+
+      h += '<div class="space-y-3">' +
+        '<div class="bg-white rounded-xl border border-gray-100 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-xl">\ud83d\udc42</div><div><h3 class="font-bold text-gray-800">\u542c\u529b\u8bad\u7ec3</h3><p class="text-xs text-gray-400">10 \u5206\u949f \u00b7 \u542c\u548c\u8ddf\u8bfb</p></div></div><ul class="text-sm text-gray-600 space-y-2 ml-13"><li>\u2705 \u9009\u4e00\u4e2a\u5c9b\uff0c\u70b9\u64ad\u653e\u542c\u53d1\u97f3</li><li>\u2705 \u5927\u58f0\u8ddf\u7740\u8bf4\uff0c\u8bf4\u9519\u4e5f\u6ca1\u5173\u7cfb\uff01</li></ul></div>' +
+        '<div class="bg-white rounded-xl border border-gray-100 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center text-xl">\ud83c\udfae</div><div><h3 class="font-bold text-gray-800">\u6311\u6218\u6a21\u5f0f</h3><p class="text-xs text-gray-400">15 \u5206\u949f \u00b7 \u5f71\u5b50\u6a21\u5f0f</p></div></div><ul class="text-sm text-gray-600 space-y-2 ml-13"><li>\u2705 \u5f00\u542f\u5f71\u5b50\u6a21\u5f0f\uff0c\u5148\u542c\u518d\u731c</li><li>\u2705 \u63c9\u638c\u63e1 5 \u53e5\u65b0\u53e5\u5b50</li></ul></div>' +
+        '<div class="bg-white rounded-xl border border-gray-100 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 rounded-xl bg-pink-100 flex items-center justify-center text-xl">\ud83c\udf1f</div><div><h3 class="font-bold text-gray-800">\u4eca\u5929\u6700\u68d2\u7684</h3><p class="text-xs text-gray-400">1 \u5206\u949f \u00b7 \u9009\u4e00\u53e5\u6700\u559c\u6b22\u7684</p></div></div><ul class="text-sm text-gray-600 space-y-2 ml-13"><li>\u2705 <a href="#journal" class="text-amber-500 underline">\u53bb\u9009\u4e00\u53e5\u6700\u68d2\u7684\u53e5\u5b50</a></li></ul></div>' +
+      '</div>' +
+      '<div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4 mt-6 text-sm"><strong class="text-amber-800">\ud83d\udca1</strong><span class="text-amber-700"> \u6bcf\u5929\u73a9\u4e00\u70b9\u70b9\u5c31\u597d\uff0c\u4e0d\u7528\u8d76\u5de5\u592b\uff01</span></div>' +
+      '<div class="bg-white rounded-xl border border-gray-100 p-5 mt-6 text-center"><p class="text-gray-500 text-sm">\u4eca\u65e5\u8bad\u7ec3\u7edf\u8ba1</p><p class="text-4xl font-extrabold text-amber-500 mt-2">' + state.daily.sentences + '</p><p class="text-gray-400 text-sm">\u53e5\u5df2\u638c\u63e1</p></div></div>';
+      c.innerHTML = h;
+    } else {
+      var h = '<div class="max-w-2xl mx-auto px-4 py-8">' +
+        '<a href="#" onclick="app.nav(\'home\');return false;" class="flex items-center gap-1 text-gray-400 hover:text-gray-600 text-sm mb-6 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>返回</a>' +
+        '<h1 class="text-2xl font-bold text-gray-800 mb-2">\u23f0 每日训练</h1>' +
+        '<p class="text-gray-500 text-sm mb-6">三种时间块 — 创造 · 维护 · 恢复</p>';
+
+      // SRS Review recommendation
+      if (srsDue.length > 0) {
+        h += '<div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-4 text-sm text-emerald-700 cursor-pointer hover:shadow-md transition" onclick="app.nav(\'review\')">\ud83d\udd04 <strong>' + getAllDueReviews().length + '</strong> 句间隔复习到期（安全边际：先复习旧内容再学新内容）→ 点击开始</div>';
+      }
+
+      // Time today
+      h += '<div class="bg-indigo-50 border border-indigo-100 rounded-xl p-3 mb-4 text-sm text-indigo-700">\u23f1\ufe0f 今日投入：<strong>' + getTodayMinutes() + '</strong> 分钟（机会成本：你的时间是否花在最高回报的活动上？）</div>';
+
+      h += '<div class="space-y-3">' +
+        '<div class="bg-white rounded-xl border border-gray-100 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center text-xl">\ud83d\udcaa</div><div><h3 class="font-bold text-gray-800">\u6df1\u5ea6\u7ec3\u4e60</h3><p class="text-xs text-gray-400">15 \u5206\u949f \u00b7 \u521b\u9020\u65f6\u95f4</p></div></div><ul class="text-sm text-gray-600 space-y-2 ml-13"><li>\u2705 \u9009\u4e00\u4e2a\u5c9b\uff0c\u5f00\u542f\u5f71\u5b50\u6a21\u5f0f\u8bad\u7ec3</li><li>\u2705 \u5c1d\u8bd5\u66ff\u6362\u5173\u952e\u8bcd\u521b\u9020\u65b0\u53e5\u5b50\uff08\u4e8c\u9636\u601d\u7ef4\uff09</li></ul></div>' +
+        '<div class="bg-white rounded-xl border border-gray-100 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-xl">\ud83d\udd04</div><div><h3 class="font-bold text-gray-800">\u95f4\u9694\u590d\u4e60</h3><p class="text-xs text-gray-400">10 \u5206\u949f \u00b7 \u7ef4\u62a4\u65f6\u95f4\uff08\u5b89\u5168\u8fb9\u9645\uff09</p></div></div><ul class="text-sm text-gray-600 space-y-2 ml-13"><li>\u2705 \u590d\u4e60\u5230\u671f\u7684\u53e5\u5b50\uff0c\u786e\u4fdd\u4e0d\u9057\u5fd8</li><li>\u2705 <a href="#review" class="text-indigo-500 underline">\u524d\u5f80\u590d\u4e60\u9875\u9762</a></li></ul></div>' +
+        '<div class="bg-white rounded-xl border border-gray-100 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-xl">\ud83c\udfb5</div><div><h3 class="font-bold text-gray-800">\u8865\u5145\u5b66\u4e60</h3><p class="text-xs text-gray-400">10 \u5206\u949f \u00b7 \u6062\u590d\u65f6\u95f4</p></div></div><ul class="text-sm text-gray-600 space-y-2 ml-13"><li>\u2705 \u70b9\u51fb\u201c\u64ad\u653e\u5168\u90e8\u201d\uff0c\u5728\u901a\u52e4/\u505a\u5bb6\u52a1\u65f6\u80cc\u666f\u542c</li><li>\u2705 \u4e0d\u9700\u8981\u4e13\u6ce8\uff0c\u8ba9\u8033\u6735\u719f\u6089\u8282\u594f\u548c\u53d1\u97f3</li></ul></div>' +
+        '<div class="bg-white rounded-xl border border-gray-100 p-5"><div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-xl">\ud83d\udcdd</div><div><h3 class="font-bold text-gray-800">\u53cd\u601d\u8f93\u51fa</h3><p class="text-xs text-gray-400">5 \u5206\u949f \u00b7 \u8d39\u66fc\u6280\u5de7 + \u5f1f\u5b50\u6548\u5e94</p></div></div><ul class="text-sm text-gray-600 space-y-2 ml-13"><li>\u2705 \u9009\u4e00\u53e5\u4eca\u5929\u5b66\u5230\u7684\u53e5\u578b\uff0c\u5199\u4e0b\u4f7f\u7528\u573a\u666f</li><li>\u2705 \u8bd5\u7740\u628a\u8fd9\u53e5\u8bdd\u201c\u6559\u201d\u7ed9\u5bb6\u4eba/\u670b\u53cb</li><li>\u2705 <a href="#journal" class="text-indigo-500 underline">\u53bb\u5199\u53cd\u601d\u65e5\u8bb0</a></li></ul></div>' +
+      '</div>' +
+      '<div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4 mb-6 text-sm"><strong class="text-amber-800">\ud83d\udca1 \u9f50\u52a0\u5c3c\u514b\u6548\u5e94\uff1a</strong><span class="text-amber-700">\u6ca1\u7cbe\u529b\u65f6\uff0c\u53ea\u505a\u6700\u5c0f\u884c\u52a8\u2014\u2014\u6253\u5f00\u5e94\u7528\u3001\u542c\u4e00\u53e5\u3001\u638c\u63e1\u4e00\u53e5\u3002\u53ea\u8981\u542f\u52a8\u4e86\u5c31\u8d62\u4e86\u3002</span></div>' +
+      '<div class="bg-white rounded-xl border border-gray-100 p-5 text-center"><p class="text-gray-500 text-sm">\u4eca\u65e5\u8bad\u7ec3\u7edf\u8ba1</p><p class="text-4xl font-extrabold text-indigo-600 mt-2">' + state.daily.sentences + '</p><p class="text-gray-400 text-sm">\u53e5\u5df2\u638c\u63e1</p></div></div>';
+      c.innerHTML = h;
+    }
+  }
+
+  // ---- JOURNAL ----
+  function renderJournal() {
+    var c = document.getElementById('page-journal-content'); if (!c) return;
+    if (!state.user) { c.innerHTML = '<div class="max-w-lg mx-auto px-4 py-12 text-center"><p class="text-gray-400">请先选择学习者</p><button onclick="app.nav(\'home\')" class="mt-4 px-4 py-2 bg-indigo-500 text-white rounded-lg">返回首页</button></div>'; return; }
+    var child = isChild();
+
+    if (child) {
+      var h = '<div class="max-w-2xl mx-auto px-4 py-8">' +
+        '<a href="#" onclick="app.nav(\'home\');return false;" class="flex items-center gap-1 text-gray-400 hover:text-gray-600 text-sm mb-6 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>返回</a>' +
+        '<h1 class="text-2xl font-bold text-gray-800 mb-2">\ud83c\udf1f 今天最棒的一句</h1>' +
+        '<p class="text-gray-500 text-sm mb-6">选一句今天印象最深的英语句子，或者自己写一句！</p>';
+
+      // Auto-fill from learned sentences
+      var learned = [];
+      APP_DATA[state.user].islands.forEach(function(isl, ii) {
+        isl.sentences.forEach(function(s, si) {
+          if (isCompleted(state.user, ii, si)) learned.push(s);
+        });
+      });
+
+      if (learned.length > 0) {
+        var sample = learned.slice(-8);
+        h += '<div class="bg-white rounded-xl border border-gray-100 p-5 mb-6"><h3 class="font-bold text-gray-700 mb-3">从已学的句子中选一句</h3><div class="grid grid-cols-1 gap-2">';
+        sample.forEach(function(s) {
+          h += '<div onclick="app.pickFavorite(\'' + esc(s).replace(/'/g, "\\'") + '\')" class="p-3 rounded-lg border border-gray-100 hover:border-amber-300 hover:bg-amber-50 cursor-pointer text-sm text-gray-700 transition">' + esc(s) + '</div>';
+        });
+        h += '</div></div>';
+      }
+
+      h += '<div class="bg-white rounded-xl border border-gray-100 p-5 mb-6"><h3 class="font-bold text-gray-700 mb-3">或者自己写一句</h3>' +
+        '<input id="j-sentence" type="text" placeholder="用英语写一句今天学到的话..." class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300">' +
+        '<button onclick="app.saveChildFavorite()" class="w-full mt-3 py-2.5 rounded-lg bg-amber-500 text-white font-medium hover:bg-amber-600 transition">选定⭐</button></div>';
+
+      if (state.journal.length > 0) {
+        h += '<h3 class="font-bold text-gray-700 mb-3">收藏的星星句</h3><div class="space-y-3">';
+        state.journal.slice().reverse().forEach(function(e) {
+          h += '<div class="bg-white rounded-xl border border-gray-100 p-4"><div class="flex items-center justify-between mb-2"><span class="text-xs text-gray-400">' + (e.date || '') + '</span><button onclick="app.deleteJournal(\'' + (e.date || '') + '\')" class="text-xs text-gray-300 hover:text-red-400">删除</button></div>' +
+            '<p class="text-sm font-medium text-amber-600">\u2b50 ' + esc(e.sentence || '') + '</p></div>';
+        });
+        h += '</div>';
+      }
+      h += '</div>';
+    } else {
+      var h = '<div class="max-w-2xl mx-auto px-4 py-8">' +
+        '<a href="#" onclick="app.nav(\'home\');return false;" class="flex items-center gap-1 text-gray-400 hover:text-gray-600 text-sm mb-6 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>返回</a>' +
+        '<h1 class="text-2xl font-bold text-gray-800 mb-2">\ud83d\udcdd 反思日记</h1>' +
+        '<p class="text-gray-500 text-sm mb-6">\u201c分享学习过程，不仅能让你的学得更快，还能让世界上某个地方的人，因为你的分享而改变人生轨迹。\u201d \u2014\u2014 Dan Koe</p>';
+
+      // Auto-fill suggestion from learned sentences
+      var learned = [];
+      APP_DATA[state.user].islands.forEach(function(isl, ii) {
+        isl.sentences.forEach(function(s, si) {
+          if (isCompleted(state.user, ii, si)) learned.push(s);
+        });
+      });
+      if (learned.length > 0) {
+        h += '<div class="bg-indigo-50 border border-indigo-100 rounded-xl p-3 mb-4 text-xs text-indigo-600 cursor-pointer" onclick="document.getElementById(\'j-sentence\').value=\'' + esc(learned[learned.length - 1].replace(/'/g, "\\'")) + '\'">\ud83d\udca1 点击自动填入最近掌握的句子</div>';
+      }
+
+      h += '<div class="bg-white rounded-xl border border-gray-100 p-5 mb-6"><h3 class="font-bold text-gray-700 mb-3">今天学到了什么？</h3><div class="space-y-3">' +
+          '<div><label class="text-sm text-gray-500 block mb-1">今天的金句（用英语写一句印象最深的句子）</label><input id="j-sentence" type="text" placeholder="e.g. I usually have coffee and toast for breakfast." class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"></div>' +
+          '<div><label class="text-sm text-gray-500 block mb-1">使用场景（你会在什么情况下用这句话？）</label><textarea id="j-scene" rows="2" placeholder="比如在早餐店点餐时..." class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"></textarea></div>' +
+          '<div><label class="text-sm text-gray-500 block mb-1">教给别人（用简单的话解释这句话的用法）</label><textarea id="j-teach" rows="2" placeholder="比如：这句话意思是..." class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"></textarea></div>' +
+          '<div><label class="text-sm text-gray-500 block mb-1">逆向思考（芒格：哪里可能出错？）</label><textarea id="j-reverse" rows="2" placeholder="比如：在正式场合这样说可能不太合适，因为..." class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 resize-none"></textarea></div>' +
+          '<button onclick="app.saveJournal()" class="w-full py-2.5 rounded-lg bg-indigo-500 text-white font-medium hover:bg-indigo-600 transition">保存今天的反思</button></div></div>';
+
+      if (state.journal.length > 0) {
+        h += '<h3 class="font-bold text-gray-700 mb-3">历史记录</h3><div class="space-y-3">';
+        state.journal.slice().reverse().forEach(function(e) {
+          h += '<div class="bg-white rounded-xl border border-gray-100 p-4"><div class="flex items-center justify-between mb-2"><span class="text-xs text-gray-400">' + (e.date || '') + '</span><button onclick="app.deleteJournal(\'' + (e.date || '') + '\')" class="text-xs text-gray-300 hover:text-red-400">删除</button></div>' +
+            '<p class="text-sm font-medium text-indigo-600 mb-1 italic">\u201c' + esc(e.sentence || '') + '\u201d</p>' +
+            (e.scene ? '<p class="text-sm text-gray-600">\ud83c\udfac ' + esc(e.scene) + '</p>' : '') +
+            (e.teach ? '<p class="text-sm text-gray-500 mt-1">\ud83c\udf93 ' + esc(e.teach) + '</p>' : '') +
+            (e.reverse ? '<p class="text-sm text-purple-500 mt-1">\ud83e\uddd8 ' + esc(e.reverse) + '</p>' : '') + '</div>';
+        });
+        h += '</div>';
+      }
+      h += '</div>';
+    }
+    c.innerHTML = h;
+  }
+
+  // ---- REVIEW (Spaced Repetition Page) ----
+  function renderReview() {
+    var c = document.getElementById('page-review-content'); if (!c) return;
+    var due = getAllDueReviews();
+    var srsStats; if (state.user) { srsStats = getSRSStats(state.user); } else { var _a=state.srs,_t=todayStr(); srsStats={total:_a.length,due:_a.filter(function(r){return r.dueDate<=_t;}).length,mastered:_a.filter(function(r){return r.reps>=SRS_INTERVALS.length;}).length}; }
+
+    var h = '<div class="max-w-2xl mx-auto px-4 py-8">' +
+      '<a href="#" onclick="app.nav(\'home\');return false;" class="flex items-center gap-1 text-gray-400 hover:text-gray-600 text-sm mb-6 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>返回</a>' +
+      '<h1 class="text-2xl font-bold text-gray-800 mb-2">\ud83d\udd04 间隔复习</h1>' +
+      '<p class="text-gray-500 text-sm mb-6">芒格"安全边际"：复习旧内容是回报最高的时间投入</p>';
+
+    // Stats summary
+    h += '<div class="grid grid-cols-3 gap-3 mb-6">' +
+      '<div class="bg-white rounded-xl border border-gray-100 p-3 text-center"><p class="text-2xl font-extrabold text-emerald-600">' + srsStats.total + '</p><p class="text-xs text-gray-400">进入SRS</p></div>' +
+      '<div class="bg-white rounded-xl border border-gray-100 p-3 text-center"><p class="text-2xl font-extrabold text-amber-600">' + srsStats.due + '</p><p class="text-xs text-gray-400">待复习</p></div>' +
+      '<div class="bg-white rounded-xl border border-gray-100 p-3 text-center"><p class="text-2xl font-extrabold text-indigo-600">' + srsStats.mastered + '</p><p class="text-xs text-gray-400">已巩固</p></div></div>';
+
+    if (due.length === 0) {
+      h += '<div class="bg-green-50 border border-green-200 rounded-xl p-8 text-center"><p class="text-3xl mb-3">\u2705</p><p class="text-green-700 font-bold">\u6682\u65e0\u5230\u671f\u590d\u4e60</p><p class="text-green-500 text-sm mt-1">\u6240\u6709\u53e5\u5b50\u90fd\u5728\u5b89\u5168\u533a\u57df\uff0c\u7ee7\u7eed\u5b66\u4e60\u65b0\u53e5\u5b50\u5427\uff01</p></div>';
+    } else {
+      // Munger wisdom
+      h += '<div class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-4 mb-6 text-sm"><strong class="text-purple-800">\ud83e\uddd8 芒格：</strong><span class="text-purple-700">\u201c安全边际\u201d\u2014\u2014 复习1句旧句 > 学3句新句。记忆的遗忘是不可逆的，而复习是最低成本的维护。</span></div>';
+
+      h += '<div class="space-y-3">';
+      due.forEach(function(r, ri) {
+        var s = APP_DATA[r.uk] && APP_DATA[r.uk].islands[r.ii] ? APP_DATA[r.uk].islands[r.ii].sentences[r.si] : null;
+        if (!s) return;
+        var islName = APP_DATA[r.uk].islands[r.ii].name;
+        var overdue = r.dueDate < todayStr();
+
+        h += '<div class="review-item bg-white rounded-xl border ' + (overdue ? 'border-amber-200 bg-amber-50/30' : 'border-gray-100') + ' p-4 flex items-start gap-3" data-ri="' + ri + '">' +
+          '<button onclick="app.reviewPlay(' + ri + ')" class="play-btn w-8 h-8 rounded-full bg-emerald-100 hover:bg-emerald-200 flex items-center justify-center shrink-0 mt-0.5 transition"><svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>' +
+          '<div class="flex-1 min-w-0">' +
+            '<p class="text-sm text-gray-800">' + esc(s) + '</p>' +
+            '<p class="text-[10px] text-gray-400 mt-1">' + esc(islName) + ' · 复习第 ' + (r.reps + 1) + ' 次' + (overdue ? ' · \u23f0 已逾期' : '') + '</p>' +
+            '<p class="text-[10px] text-gray-400">间隔：' + r.interval + ' 天</p>' +
+          '</div>' +
+          '<button onclick="app.markReviewed(\'' + r.uk + '\',' + r.ii + ',' + r.si + ')" class="text-xs px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium transition shrink-0">已记住</button>' +
+        '</div>';
+      });
+      h += '</div>';
+
+      // Play all reviews
+      h += '<button onclick="app.playAllReviews()" class="w-full mt-4 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm transition">\u25b6 连续播放所有待复习句子</button>';
+    }
+
+    h += '</div>';
+    c.innerHTML = h;
+  }
+
+  // ---- UI helpers ----
+  function updatePlayingUI() {
+    var items = document.querySelectorAll('.sentence-item, .review-item');
+    for (var i = 0; i < items.length; i++) {
+      var el = items[i], idx = parseInt(el.getAttribute('data-idx') || el.getAttribute('data-ri'));
+      if (idx === undefined || idx === null) continue;
+      var btn = el.querySelector('.play-btn'), isP = state.playingIdx === idx;
+      if (isP) el.classList.add('playing'); else el.classList.remove('playing');
+      if (btn) { if (isP) btn.classList.add('playing'); else btn.classList.remove('playing');
+        var color = isChild() ? 'text-amber-500' : 'text-indigo-500';
+        if (el.classList.contains('review-item')) color = 'text-emerald-600';
+        btn.innerHTML = isP ? '<svg class="w-4 h-4 ' + color + '" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>' : '<svg class="w-4 h-4 ' + color + '" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+      }
+    }
+  }
+
+  function playAllFn() {
+    if (synth.speaking) { stopSpeaking(); playAllQueue=[]; var b=document.getElementById('play-all-text'); if(b) b.innerHTML='\u25b6 播放全部（'+APP_DATA[state.user].islands[state.islandIdx].sentences.length+' 句）'; return; }
+    playAllQueue=APP_DATA[state.user].islands[state.islandIdx].sentences.slice(); playAllIndex=0; playNext();
+  }
+
+  function playNext() {
+    if (playAllIndex>=playAllQueue.length) { playAllQueue=[]; var b=document.getElementById('play-all-text'); if(b) b.innerHTML='\u25b6 播放全部（'+APP_DATA[state.user].islands[state.islandIdx].sentences.length+' 句）'; return; }
+    var b=document.getElementById('play-all-text'); if(b) b.innerHTML='\u23f8 停止（'+(playAllIndex+1)+'/'+playAllQueue.length+'）';
+    speak(getEn(playAllQueue[playAllIndex]),playAllIndex,function(){setTimeout(function(){playAllIndex++;playNext();},1200);});
+  }
+
+  // Review play helpers
+  var reviewQueue = [], reviewPlayIndex = 0;
+
+  function playAllReviewsFn() {
+    var due = getAllDueReviews();
+    if (due.length === 0) return;
+    if (synth.speaking) { stopSpeaking(); reviewQueue=[]; return; }
+    reviewQueue = due.map(function(r) {
+      return APP_DATA[r.uk] && APP_DATA[r.uk].islands[r.ii] ? APP_DATA[r.uk].islands[r.ii].sentences[r.si] : null;
+    }).filter(function(s) { return s; });
+    reviewPlayIndex = 0;
+    playReviewNext();
+  }
+
+  function playReviewNext() {
+    if (reviewPlayIndex >= reviewQueue.length) { reviewQueue=[]; return; }
+    speak(getEn(reviewQueue[reviewPlayIndex]), reviewPlayIndex, function() {
+      setTimeout(function() { reviewPlayIndex++; playReviewNext(); }, 1500);
+    });
+  }
+
+  // ---- Init ----
+  function init() {
+    loadAll();
+    if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = function(){};
+    trackTimeStart();
+    var appEl = document.getElementById('app');
+    appEl.innerHTML =
+      '<div id="page-home" class="page active"><div id="page-home-content"></div></div>' +
+      '<div id="page-islands" class="page"><div id="page-islands-content"></div></div>' +
+      '<div id="page-detail" class="page"><div id="page-detail-content"></div></div>' +
+      '<div id="page-progress" class="page"><div id="page-progress-content"></div></div>' +
+      '<div id="page-plan" class="page"><div id="page-plan-content"></div></div>' +
+      '<div id="page-daily" class="page"><div id="page-daily-content"></div></div>' +
+      '<div id="page-journal" class="page"><div id="page-journal-content"></div></div>' +
+      '<div id="page-review" class="page"><div id="page-review-content"></div></div>';
+    handleRoute();
+  }
+
+  // ---- Public API ----
+  window.app = {
+    nav: function(p) { window.location.hash=p; navigate(p); },
+    selectUser: function(uk) { state.user=uk; window.location.hash='u/'+uk; navigate('islands'); },
+    selectIsland: function(idx) { state.islandIdx=idx; state.revealedSentences={}; window.location.hash='u/'+state.user+'/'+idx; navigate('detail'); },
+    playSentence: function(idx) { speak(getEn(APP_DATA[state.user].islands[state.islandIdx].sentences[idx]),idx); },
+    markDone: function(idx) { markCompleted(state.user,state.islandIdx,idx); renderDetail(); },
+    revealSentence: function(idx) { state.revealedSentences[idx]=true; renderDetail(); },
+    toggleShadow: function() { state.shadowMode=!state.shadowMode; if(state.islandIdx!==null&&document.getElementById('page-detail').classList.contains('active')) renderDetail(); else renderIslands(); },
+    resetProgress: function() { if(confirm('确定重置所有进度？')) { state.completedSentences={}; state.streak={count:0,lastDate:null,history:[]}; state.daily={date:null,sentences:0}; state.journal=[]; state.stars=0; state.srs=[]; state.badges=[]; save(STORAGE_KEY,{completed:{}}); save(STREAK_KEY,state.streak); save(DAILY_KEY,state.daily); save(JOURNAL_KEY,[]); save(STAR_KEY,0); save(SRS_KEY,[]); save(BADGE_KEY,[]); navigate('progress'); } },
+    playAll: playAllFn,
+    toggleGuide: function() { var c=document.getElementById('guide-content'),a=document.getElementById('guide-arrow'); if(c.classList.contains('hidden')){c.classList.remove('hidden');a.style.transform='rotate(180deg)';}else{c.classList.add('hidden');a.style.transform='rotate(0deg)';} },
+    // Journal
+    saveJournal: function() {
+      var s=document.getElementById('j-sentence').value.trim(),sc=document.getElementById('j-scene').value.trim(),t=document.getElementById('j-teach').value.trim();
+      var rv = document.getElementById('j-reverse') ? document.getElementById('j-reverse').value.trim() : '';
+      if(!s){alert('请写下今天的金句');return;}
+      state.journal.push({date:todayStr()+' '+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}),sentence:s,scene:sc,teach:t,reverse:rv});
+      save(JOURNAL_KEY,state.journal.slice(-50)); checkBadges(state.user); renderJournal();
+    },
+    saveChildFavorite: function() {
+      var s=document.getElementById('j-sentence').value.trim();
+      if(!s){alert('请写下你的英语句子');return;}
+      state.journal.push({date:todayStr(),sentence:s,scene:''});
+      save(JOURNAL_KEY,state.journal.slice(-50)); checkBadges(state.user); renderJournal();
+    },
+    pickFavorite: function(s) {
+      state.journal.push({date:todayStr(),sentence:s,scene:''});
+      save(JOURNAL_KEY,state.journal.slice(-50)); checkBadges(state.user); renderJournal();
+    },
+    deleteJournal: function(d) { state.journal=state.journal.filter(function(e){return e.date!==d;}); save(JOURNAL_KEY,state.journal); renderJournal(); },
+    // Review
+    startReview: function() { window.location.hash='review'; navigate('review'); },
+    reviewPlay: function(idx) {
+      var due = getAllDueReviews();
+      var r = due[idx]; if(!r) return;
+      var s = APP_DATA[r.uk].islands[r.ii].sentences[r.si];
+      speak(getEn(s), idx);
+    },
+    markReviewed: function(uk, ii, si) {
+      markReviewed(uk, ii, si);
+      checkBadges(state.user);
+      renderReview();
+      // Badge notification
+      var newBadges = checkBadges(uk);
+      if (newBadges.length > 0) {
+        var names = newBadges.map(function(id) { var d = BADGE_DEFS.filter(function(b){return b.id===id;})[0]; return d ? d.icon+' '+d.name : id; }).join(', ');
+        alert('获得成就：' + names);
+      }
+    },
+    playAllReviews: playAllReviewsFn,
+    toggleChinese: function() { state.showChinese = !state.showChinese; save('ei_show_cn', state.showChinese); renderDetail(); }
+  };
+
+  window.addEventListener('hashchange', handleRoute);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+
+</script>
+</body>
+</html>
