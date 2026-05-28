@@ -109,29 +109,55 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <script>
-    /* === v5.4: Force clear ALL caches and old SWs === */
-    var APP_VERSION = 'v5.4-2026052903';
+    /* === v5.5: Self-healing cache buster === */
+    var APP_VERSION = 'v5.5-2026052904';
+    var _loadedOK = false;
 
+    // Step 1: Unregister all SWs and clear caches BEFORE anything loads
     if ("serviceWorker" in navigator) {
-      // Step 1: Kill ALL existing service workers
       navigator.serviceWorker.getRegistrations().then(function(regs) {
         return Promise.all(regs.map(function(r) { return r.unregister(); }));
-      }).catch(function() {}).then(function() {
-        // Step 2: Clear ALL caches
-        if ('caches' in window) {
-          caches.keys().then(function(names) {
-            return Promise.all(names.map(function(n) { return caches.delete(n); }));
-          }).catch(function() {});
-        }
-        // Step 3: Register new SW (network-only mode)
-        navigator.serviceWorker.register("sw.js?v=2026052903");
-      });
+      }).catch(function() {});
+      if ('caches' in window) {
+        caches.keys().then(function(names) {
+          return Promise.all(names.map(function(n) { return caches.delete(n); }));
+        }).catch(function() {});
+      }
     }
+
+    // Step 2: If page stays blank after 3s, auto-self-heal (clear storage + reload)
+    setTimeout(function() {
+      var app = document.getElementById('app');
+      if (app && app.innerHTML === '' && !_loadedOK) {
+        // Page is blank — force clear everything and reload
+        if ("serviceWorker" in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(regs) {
+            return Promise.all(regs.map(function(r) { return r.unregister(); }));
+          }).catch(function() {}).finally(function() {
+            if ('caches' in window) {
+              caches.keys().then(function(names) {
+                return Promise.all(names.map(function(n) { return caches.delete(n); }));
+              }).catch(function() {}).finally(function() {
+                location.reload(true);
+              });
+            } else {
+              location.reload(true);
+            }
+          });
+        } else {
+          location.reload(true);
+        }
+      }
+    }, 3000);
   </script>
 </head>
 <body>
   <div id="app"></div>
-  <script src="data.js?v=2026052903"></script>
-  <script src="app.js?v=2026052903"></script>
+  <script src="data.js?v=2026052904"></script>
+  <script src="app.js?v=2026052904"></script>
+  <script>
+    // Mark as loaded successfully — prevents self-heal reload
+    setTimeout(function() { _loadedOK = true; }, 100);
+  </script>
 </body>
 </html>
