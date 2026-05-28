@@ -1,4 +1,4 @@
-var CACHE_NAME = 'english-islands-v5.1';
+var CACHE_NAME = 'english-islands-v5.2';
 var ASSETS = [
   '/',
   '/index.html',
@@ -9,7 +9,7 @@ var ASSETS = [
   '/icons/icon-192.png',
   '/icons/icon-512.png'
 ];
-var CURRENT_VERSION = 'v5.1-20260528';
+var CURRENT_VERSION = 'v5.2-20260528';
 
 /* Install: cache all static assets */
 self.addEventListener('install', function(e) {
