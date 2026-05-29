@@ -545,7 +545,8 @@
       var revealed = state.revealedSentences[idx] || !state.shadowMode;
       var srsItem = state.srs.filter(function(r) { return r.uk===uk && r.ii===ii && r.si===idx; })[0];
 
-      var imgTag = isChild() ? '<img src="img/child/' + ii + '_' + String(idx).padStart(3,'0') + '.jpg" class="w-full rounded-lg mb-2" alt="" loading="lazy" onerror="this.style.display=\x27none\x27">' : '';
+      var imgFolder = isChild() ? 'img/child/' : 'img/adult/';
+      var imgTag = '<img src="' + imgFolder + ii + '_' + String(idx).padStart(3,'0') + '.jpg" class="w-full rounded-lg mb-2" alt="" loading="lazy" onerror="this.style.display=\x27none\x27>';
       h += '<div class="sentence-item bg-white rounded-xl border ' + (done ? 'border-green-200 bg-green-50/50' : 'border-gray-100') + ' p-4 flex items-start gap-3 transition" data-idx="' + idx + '">' +
         '<button onclick="app.playSentence(' + idx + ')" class="play-btn w-8 h-8 rounded-full ' + (isChild() ? 'bg-amber-100 hover:bg-amber-200' : 'bg-indigo-100 hover:bg-indigo-200') + ' flex items-center justify-center shrink-0 mt-0.5 transition"><svg class="w-4 h-4 ' + (isChild() ? 'text-amber-500' : 'text-indigo-500') + '" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>' +
         '<div class="flex-1 min-w-0">' +
