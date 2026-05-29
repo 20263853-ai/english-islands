@@ -1052,21 +1052,35 @@ window.APP_DATA = {
   function stopSpeaking() { if(synth) synth.cancel(); state.playingIdx = null; updatePlayingUI(); }
   function speak(text, idx, onEnd) {
     stopSpeaking();
+    state.playingIdx = idx; updatePlayingUI();
+    // 优先使用预生成的高质量MP3音频
+    var audioDir = state.user === 'mumu' ? 'audio/child' : 'audio/adult';
+    var audioFile = audioDir + '/' + state.islandIdx + '_' + String(idx).padStart(3,'0') + '.mp3';
+    var audio = new Audio(audioFile);
+    utterance = audio;
+    audio.onended = function(){ state.playingIdx=null; updatePlayingUI(); if(onEnd) onEnd(); };
+    audio.onerror = function(){
+      // MP3加载失败时回退到SpeechSynthesis
+      state.playingIdx=null; updatePlayingUI();
+      speakFallback(text, idx, onEnd);
+    };
+    audio.play().catch(function(){
+      state.playingIdx=null; updatePlayingUI();
+      speakFallback(text, idx, onEnd);
+    });
+  }
+
+  function speakFallback(text, idx, onEnd) {
+    if(!synth) return;
     var vc = APP_DATA[state.user].voice;
     utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = vc.lang; utterance.pitch = vc.pitch; utterance.rate = vc.rate;
-    var voices = synth ? synth.getVoices() : [], pref = null, tgt = vc.name || '';
+    var voices = synth.getVoices(), pref = null, tgt = vc.name || '';
     if (tgt) { for (var vi = 0; vi < voices.length; vi++) { if (voices[vi].name.indexOf(tgt)===0) { pref=voices[vi]; break; } } }
-    if (!pref) {
-      var ev = voices.filter(function(v){return v.lang&&v.lang.indexOf('en')===0&&v.localService;});
-      var safe = ['Samantha','Karen','Kathy','Daniel','Alex','Victoria','Moira','Junior'];
-      for (var si=0;si<safe.length;si++){for(var ei=0;ei<ev.length;ei++){if(ev[ei].name.indexOf(safe[si])===0){pref=ev[ei];break;}}if(pref)break;}
-    }
-    if (pref) utterance.voice = pref;
     state.playingIdx = idx; updatePlayingUI();
     utterance.onend = function(){ state.playingIdx=null; updatePlayingUI(); if(onEnd) onEnd(); };
     utterance.onerror = function(){ state.playingIdx=null; updatePlayingUI(); };
-    if(synth) synth.speak(utterance);
+    synth.speak(utterance);
   }
 
   // ---- Nav ----
